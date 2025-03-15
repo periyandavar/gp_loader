@@ -19,9 +19,10 @@ jobs:
           php-version: '8.0'  # Specify your PHP version
       - name: Install dependencies
         run: composer install
-      - name: Run tests
+      - name: Run PHPUnit with Xdebug Coverage
         run: |
-          $env:XDEBUG_MODE = "coverage" vendor\bin\phpunit --coverage-clover coverage.xml
+          $env:XDEBUG_MODE = "coverage"
+          vendor\bin\phpunit --coverage-clover coverage.xml
       - name: SonarCloud Scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
