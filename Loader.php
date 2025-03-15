@@ -10,7 +10,7 @@
  * @link     http://url.com
  */
 
-namespace System\Loader;
+namespace Loader;
 
 use System\Core\SysController;
 use System\Core\Utility;
