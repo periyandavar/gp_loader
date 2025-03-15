@@ -14,7 +14,6 @@
 
 use Exception;
 
-defined('VALID_REQ') or exit('Invalid request');
 /**
  * EnvParser parse the env files and loads values from it
  *
