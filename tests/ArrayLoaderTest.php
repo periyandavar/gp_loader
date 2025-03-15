@@ -1,5 +1,7 @@
 <?php
 
+namespace Test\Loader;
+
 use Loader\Config\ConfigLoader;
 use PHPUnit\Framework\TestCase;
 
