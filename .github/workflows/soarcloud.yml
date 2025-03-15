@@ -30,11 +30,11 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Optional: If you need to access GitHub API
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Optional: If you need to access GitHub API
         with:
           args: >
             -Dsonar.projectKey=periyandavar_gp_loader
-            -Dsonar.organization=periyandavar
+            -Dsonar.organization=Periyandavar Ganesh
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=.
             -Dsonar.php.coverage.reportPaths=coverage.xml
