@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class ArrayLoaderTest extends TestCase
 {
-    public function testAddition()
+    public function testArrayLoader()
     {
         $file = __DIR__ . '/fixture/array_test.php';
         ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, ['file' => $file])->load();

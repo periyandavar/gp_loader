@@ -12,6 +12,12 @@
             "Loader\\": "src//"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/",
+            "Loader\\": "src//"
+        }
+    },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.72",
         "phpunit/phpunit": "^9.6",
