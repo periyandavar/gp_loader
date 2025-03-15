@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EnvParser
  * php version 7.3.5
@@ -25,7 +26,6 @@ use Exception;
  */
 abstract class ConfigLoader
 {
-
     protected $config;
 
     protected $load_handler;
@@ -44,7 +44,6 @@ abstract class ConfigLoader
     {
         $this->config = $config;
     }
-
 
     public function load()
     {

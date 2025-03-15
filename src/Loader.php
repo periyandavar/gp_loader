@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Loader
  * php version 7.3.5
@@ -12,9 +13,9 @@
 
 namespace Loader;
 
+use System\Core\FrameworkException;
 use System\Core\SysController;
 use System\Core\Utility;
-use System\Core\FrameworkException;
 
 defined('VALID_REQ') or exit('Invalid request');
 /**
@@ -51,7 +52,7 @@ class Loader
         global $config;
         $this->_prefixes = [
             'model' => $config['model'] ?? "App\Model\\",
-            'service' => $config['service']  ?? "App\Service\\",
+            'service' => $config['service'] ?? "App\Service\\",
             'helper' => $config['helper'] ?? "App\Helper\\",
             'library' => $config['library'] ?? "System\Library\\",
         ];
@@ -77,7 +78,7 @@ class Loader
         static::$_ctrl = $ctrl;
         foreach ($loads as $load) {
             $files = $autoloads[$load];
-            is_array($files) or $files = array($files);
+            is_array($files) or $files = [$files];
             static::$_instance->$load(...$files);
         }
 
@@ -142,7 +143,7 @@ class Loader
     {
         $ns = $this->_prefixes['library'];
         foreach ($libraries as $library) {
-            $sys_lib_class = "System\\Library\\" . $library;
+            $sys_lib_class = 'System\\Library\\' . $library;
             $cust_lib_class = $ns . $library;
             if (class_exists($sys_lib_class)) {
                 static::$_ctrl->{lcfirst($library)} = new $sys_lib_class();
@@ -153,7 +154,6 @@ class Loader
             }
         }
     }
-
 
     /**
      * Loads helpers
@@ -170,7 +170,7 @@ class Loader
             //     ? $helper
             //     : $helper . '.php');
             // $helper = ucfirst($helper);
-                // var_export([$this->_prefixes['helper'] . '/' . $helper,'src/system/helper/' . $helper ]);//exit;
+            // var_export([$this->_prefixes['helper'] . '/' . $helper,'src/system/helper/' . $helper ]);//exit;
             // if (file_exists($this->_prefixes['helper'] . $helper)) {
             //     include_once $this->_prefixes['helper'] . '/' . $helper;
             // } elseif (file_exists('src/system/helper/' . $helper)) {
@@ -185,7 +185,6 @@ class Loader
             } elseif (file_exists($helper_file)) {
                 include_once $helper_file;
             } else {
-
                 throw new FrameworkException("Helper class '$helper' not found");
             }
         }
@@ -205,11 +204,10 @@ class Loader
         }
     }
 
-
     /**
      * Includes the file if it exists
      *
-     * @param string      $file   file name
+     * @param string $file file name
      *
      * @return bool
      */
@@ -219,6 +217,7 @@ class Loader
 
         if (file_exists($file)) {
             include_once $file;
+
             return true;
         }
 
@@ -235,6 +234,7 @@ class Loader
         if (self::$_instance == null) {
             self::$_instance = new static();
         }
+
         return self::$_instance;
     }
 }

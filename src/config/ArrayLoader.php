@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EnvParser
  * php version 7.3.5
@@ -10,7 +11,7 @@
  * @link     http://url.com
  */
 
- namespace Loader\Config;
+namespace Loader\Config;
 
 use Exception;
 
@@ -23,9 +24,8 @@ use Exception;
  * @license  http://license.com license
  * @link     http://url.com
  */
-class EnvLoader extends ConfigLoader
+class ArrayLoader extends ConfigLoader
 {
-
     /**
      * Loads env file values from .env file and add to $_ENV
      *
@@ -40,18 +40,7 @@ class EnvLoader extends ConfigLoader
         if (! (file_exists($file))) {
             throw new Exception('env file not found : ' . $file);
         }
-        $data = [];
-        $contents = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($contents as $line) {
-            if (strpos(trim($line), "#") !== false) {
-                continue;
-            }
-            list($key, $value) = explode('=', $line, 2);
 
-            // Create the array
-            $data[$key] = $value;
-        }
-
-        return $data;
+        return require $file;
     }
 }
