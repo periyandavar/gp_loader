@@ -1,7 +1,13 @@
 name: SonarCloud Analysis
 
 on:
-  - pull_request
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull requests targeting the main branch
+  workflow_dispatch:  # Allow manual triggering of the workflow
   
 jobs:
   tests:
@@ -37,4 +43,4 @@ jobs:
             -Dsonar.organization=periyandavar
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=.
-            -Dsonar.php.coverage.reportPaths=coverage.xml
+            -Dsonar.php.coverage.reportPaths=coverage.xml 
