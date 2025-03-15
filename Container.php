@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Loader;
+namespace Loader;
 
 use Exception;
 use ReflectionClass;

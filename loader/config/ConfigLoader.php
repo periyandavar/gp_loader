@@ -10,10 +10,9 @@
  * @link     http://url.com
  */
 
-namespace System\Loader\Config;
+namespace Loader\Config;
 
 use Exception;
-use System\Core\FrameworkException;
 
 /**
  * EnvParser parse the env files and loads values from it
