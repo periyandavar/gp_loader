@@ -34,7 +34,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=periyandavar_gp_loader
-            -Dsonar.organization=Periyandavar Ganesh
+            -Dsonar.organization=Periyandavar
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=.
             -Dsonar.php.coverage.reportPaths=coverage.xml
