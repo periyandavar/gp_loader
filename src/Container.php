@@ -131,7 +131,7 @@ class Container
     {
         $reflection = new ReflectionClass($_class_name);
         if ($reflection->isAbstract() || $reflection->isInterface()) {
-            Log::getInstance()->info("{$_class_name} is abstract or interface");
+            // Log::getInstance()->info("{$_class_name} is abstract or interface");
 
             return null;
         }
@@ -202,18 +202,6 @@ class Container
 
             if (str_starts_with(strtoupper($value), '\s')) {
                 $params[$param] = $value;
-
-                continue;
-            }
-
-            if (str_ends_with($value, '_bli')) {
-                $params[$param] = self::getBLI($value);
-
-                continue;
-            }
-
-            if (str_ends_with($value, '_ali')) {
-                $params[$param] = self::getALI($value);
 
                 continue;
             }

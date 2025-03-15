@@ -3,7 +3,7 @@
 use Loader\Config\ConfigLoader;
 use PHPUnit\Framework\TestCase;
 
-class ExampleTest extends TestCase
+class ArrayLoaderTest extends TestCase
 {
     public function testAddition()
     {

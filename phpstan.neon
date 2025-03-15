@@ -3,8 +3,6 @@ parameters:
     paths:
         - %currentWorkingDirectory%/src  # Adjust this path to your source code directory
         - %currentWorkingDirectory%/tests  # Include your tests directory if applicable
-    ignoreErrors:
-        - '#Call to an undefined method .*#'  # Ignore undefined method errors (customize as needed)
     excludePaths:
         - %currentWorkingDirectory%/vendor  # Exclude vendor directory from analysis
 

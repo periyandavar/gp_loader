@@ -38,7 +38,6 @@ abstract class ConfigLoader
      *
      * @param $file ENV File Name
      *
-     * @throws FrameworkException
      */
     protected function __construct($config)
     {
@@ -71,7 +70,7 @@ abstract class ConfigLoader
             return call_user_func($this->load_handler, $data);
         }
 
-        return $this->defaultHandler($data);
+        $this->defaultHandler($data);
     }
 
     public function setLoadHandler(callable $_load_handler)

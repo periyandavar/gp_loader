@@ -29,7 +29,7 @@ class ArrayLoader extends ConfigLoader
     /**
      * Loads env file values from .env file and add to $_ENV
      *
-     * @return void
+     * @return array
      */
     public function innerLoader(): array
     {
