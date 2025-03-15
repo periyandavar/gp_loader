@@ -1,0 +1,13 @@
+stages:
+  - test
+  - sonar
+
+test:
+  stage: test
+  script:
+    - ./vendor/bin/phpunit --coverage-clover build/coverage.xml
+
+sonar-scanner:
+  stage: sonar
+  script:
+    - sonar-scanner -Dsonar.projectKey=your_project_key -Dsonar.sources=src -Dsonar.php.coverage.reportPaths=build/coverage.xml

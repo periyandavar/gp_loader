@@ -18,7 +18,6 @@ use System\Core\FrameworkException;
 use System\Core\SysController;
 use System\Core\Utility;
 
-defined('VALID_REQ') or exit('Invalid request');
 /**
  * Loader Class autoloads the files
  *
@@ -33,17 +32,17 @@ class Loader
     /**
      * Loader class instance
      *
-     * @var Loader|null $_instance
+     * @var Loader|null $instance
      */
-    protected static $_instance = null;
+    protected static $instance = null;
 
-    private $_prefixes = [];
+    private $prefixes = [];
     /**
      * Controller object
      *
      * @var object
      */
-    protected static $_ctrl;
+    protected static $ctrl;
 
     /**
      * Instantiate the the Loader instance
@@ -51,7 +50,7 @@ class Loader
     private function __construct()
     {
         global $config;
-        $this->_prefixes = [
+        $this->prefixes = [
             'model' => $config['model'] ?? "App\Model\\",
             'service' => $config['service'] ?? "App\Service\\",
             'helper' => $config['helper'] ?? "App\Helper\\",
@@ -74,17 +73,17 @@ class Loader
         global $autoload;
         $autoloads = $autoloads ?? $autoload;
         $loads = ['model', 'service', 'library', 'helper'];
-        static::$_instance ?? static::intialize();
-        static::$_ctrl = $ctrl;
+        static::$instance ?? static::intialize();
+        static::$ctrl = $ctrl;
         foreach ($loads as $load) {
             $files = $autoloads[$load];
             if (! is_array($files)) {
                 $files = [$files];
             }
-            static::$_instance->$load(...$files);
+            static::$instance->$load(...$files);
         }
 
-        return static::$_instance;
+        return static::$instance;
     }
 
     /**
@@ -96,11 +95,11 @@ class Loader
      */
     public function model(...$models)
     {
-        $ns = $this->_prefixes['model'];
+        $ns = $this->prefixes['model'];
         foreach ($models as $model) {
             $class = $ns . $model . 'Model';
             if (class_exists($class)) {
-                static::$_ctrl->{lcfirst($model)} = new $class();
+                static::$ctrl->{lcfirst($model)} = new $class();
             } else {
                 throw new Exception(
                     "Unable to locate the model class '$model'"
@@ -119,11 +118,11 @@ class Loader
      */
     public function service(...$services)
     {
-        $ns = $this->_prefixes['service'];
+        $ns = $this->prefixes['service'];
         foreach ($services as $service) {
             $class = $ns . $service . 'Service';
             if (class_exists($class)) {
-                static::$_ctrl->{lcfirst($service)} = new $class();
+                static::$ctrl->{lcfirst($service)} = new $class();
             } else {
                 throw new Exception(
                     "Unable to loacate the '$service' class"
@@ -142,14 +141,14 @@ class Loader
      */
     public function library(...$libraries)
     {
-        $ns = $this->_prefixes['library'];
+        $ns = $this->prefixes['library'];
         foreach ($libraries as $library) {
             $sys_lib_class = 'System\\Library\\' . $library;
             $cust_lib_class = $ns . $library;
             if (class_exists($sys_lib_class)) {
-                static::$_ctrl->{lcfirst($library)} = new $sys_lib_class();
+                static::$ctrl->{lcfirst($library)} = new $sys_lib_class();
             } elseif (class_exists($cust_lib_class)) {
-                static::$_ctrl->{lcfirst($library)} = new $cust_lib_class();
+                static::$ctrl->{lcfirst($library)} = new $cust_lib_class();
             } else {
                 throw new Exception("Library class '$library' not found");
             }
@@ -168,7 +167,7 @@ class Loader
     {
         foreach ($helpers as $helper) {
             $helper_file = '/src/system/helper/' . $helper . '.php';
-            if (class_exists($this->_prefixes['helper'] . $helper)) {
+            if (class_exists($this->prefixes['helper'] . $helper)) {
                 //
             } elseif (file_exists($helper_file)) {
                 include_once $helper_file;
@@ -219,10 +218,10 @@ class Loader
      */
     public static function intialize(): Loader
     {
-        if (self::$_instance == null) {
-            self::$_instance = new self();
+        if (self::$instance == null) {
+            self::$instance = new self();
         }
 
-        return self::$_instance;
+        return self::$instance;
     }
 }

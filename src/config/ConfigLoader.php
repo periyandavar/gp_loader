@@ -28,7 +28,7 @@ abstract class ConfigLoader
 {
     protected $config;
 
-    protected $load_handler;
+    protected $loadHandler;
 
     public const ENV_LOADER = 'env';
     public const ARRAY_LOADER = 'array';
@@ -66,16 +66,16 @@ abstract class ConfigLoader
 
     private function loadHandler($data)
     {
-        if ($this->load_handler) {
-            return call_user_func($this->load_handler, $data);
+        if ($this->loadHandler) {
+            return call_user_func($this->loadHandler, $data);
         }
 
         $this->defaultHandler($data);
     }
 
-    public function setLoadHandler(callable $_load_handler)
+    public function setLoadHandler(callable $_loadHandler)
     {
-        $this->load_handler = $_load_handler;
+        $this->loadHandler = $_loadHandler;
     }
 
     /**
