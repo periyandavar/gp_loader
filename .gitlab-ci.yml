@@ -3,11 +3,16 @@ stages:
   - sonar
 
 test:
-  stage: test
-  env:
-    XDEBUG_MODE: coverage
+  before_script:
+    - apt-get update && apt-get install -y git unzip
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - composer install
   script:
+    - export XDEBUG_MODE=coverage
     - ./vendor/bin/phpunit --coverage-clover build/coverage.xml
+  artifacts:
+    paths:
+      - build/coverage.xml
 
 sonar-scanner:
   stage: sonar
