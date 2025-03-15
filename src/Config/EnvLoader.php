@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EnvParser
  * php version 7.3.5
@@ -10,7 +11,7 @@
  * @link     http://url.com
  */
 
- namespace Loader\Config;
+namespace Loader\Config;
 
 use Exception;
 
@@ -25,11 +26,10 @@ use Exception;
  */
 class EnvLoader extends ConfigLoader
 {
-
     /**
      * Loads env file values from .env file and add to $_ENV
      *
-     * @return void
+     * @return array
      */
     public function innerLoader(): array
     {
@@ -43,13 +43,13 @@ class EnvLoader extends ConfigLoader
         $data = [];
         $contents = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         foreach ($contents as $line) {
-            if (strpos(trim($line), "#") !== false) {
+            if (strpos(trim($line), '#') !== false) {
                 continue;
             }
             list($key, $value) = explode('=', $line, 2);
 
             // Create the array
-            $data[] = [$key => $value];
+            $data[$key] = $value;
         }
 
         return $data;

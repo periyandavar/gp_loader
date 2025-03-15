@@ -17,8 +17,8 @@ class Container
      * Set the instance and service in the container.
      *
      * @param string $_name
-     * @param mixed $_closure
-     * @param bool  $_singleton
+     * @param mixed  $_closure
+     * @param bool   $_singleton
      */
     public static function set(string $_name, mixed $_closure, bool $_singleton = false)
     {
@@ -131,7 +131,7 @@ class Container
     {
         $reflection = new ReflectionClass($_class_name);
         if ($reflection->isAbstract() || $reflection->isInterface()) {
-            Log::getInstance()->info("{$_class_name} is abstract or interface");
+            // Log::getInstance()->info("{$_class_name} is abstract or interface");
 
             return null;
         }
@@ -157,14 +157,12 @@ class Container
     {
         foreach ($_config as $name => $config) {
             $singleton = $config['singleton'] ?? false;
-            $closure = function () use ($config) {
+            $closure = function() use ($config) {
                 if ($config['params']) {
                     $params = self::getClassParams($config['params']);
 
-
                     return new $config['class'](...$params);
                 }
-
 
                 return new $config['class']();
             };
@@ -184,7 +182,6 @@ class Container
         $params = [];
 
         foreach ($_params as $param => $value) {
-
             if (is_object($value)) {
                 $params[$param] = $value;
 
@@ -205,18 +202,6 @@ class Container
 
             if (str_starts_with(strtoupper($value), '\s')) {
                 $params[$param] = $value;
-
-                continue;
-            }
-
-            if (str_ends_with($value, '_bli')) {
-                $params[$param] = self::getBLI($value);
-
-                continue;
-            }
-
-            if (str_ends_with($value, '_ali')) {
-                $params[$param] = self::getALI($value);
 
                 continue;
             }

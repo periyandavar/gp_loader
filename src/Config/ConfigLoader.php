@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EnvParser
  * php version 7.3.5
@@ -25,25 +26,23 @@ use Exception;
  */
 abstract class ConfigLoader
 {
-
     protected $config;
 
-    protected $load_handler;
+    protected $loadHandler;
 
     public const ENV_LOADER = 'env';
+    public const ARRAY_LOADER = 'array';
 
     /**
      * Instantitate the new EnvParser Instance
      *
      * @param $file ENV File Name
      *
-     * @throws FrameworkException
      */
     protected function __construct($config)
     {
         $this->config = $config;
     }
-
 
     public function load()
     {
@@ -58,6 +57,8 @@ abstract class ConfigLoader
         switch ($driver) {
             case self::ENV_LOADER:
                 return new EnvLoader($config);
+            case self::ARRAY_LOADER:
+                return new ArrayLoader($config);
             default:
                 throw new Exception('Driver not found : ' . $driver);
         }
@@ -65,16 +66,16 @@ abstract class ConfigLoader
 
     private function loadHandler($data)
     {
-        if ($this->load_handler) {
-            return call_user_func($this->load_handler, $data);
+        if ($this->loadHandler) {
+            return call_user_func($this->loadHandler, $data);
         }
 
-        return $this->defaultHandler($data);
+        $this->defaultHandler($data);
     }
 
-    public function setLoadHandler(callable $_load_handler)
+    public function setLoadHandler(callable $_loadHandler)
     {
-        $this->load_handler = $_load_handler;
+        $this->loadHandler = $_loadHandler;
     }
 
     /**
@@ -84,10 +85,8 @@ abstract class ConfigLoader
      */
     protected function defaultHandler($data)
     {
-        foreach ($data as $value) {
-            foreach ($value as $key => $val) {
-                putenv("$key=$val");
-            }
+        foreach ($data as $key => $value) {
+            putenv("$key=$value");
         }
     }
 }
