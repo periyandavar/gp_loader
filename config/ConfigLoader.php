@@ -31,6 +31,7 @@ abstract class ConfigLoader
     protected $load_handler;
 
     public const ENV_LOADER = 'env';
+    public const ARRAY_LOADER = 'array';
 
     /**
      * Instantitate the new EnvParser Instance
@@ -58,6 +59,8 @@ abstract class ConfigLoader
         switch ($driver) {
             case self::ENV_LOADER:
                 return new EnvLoader($config);
+            case self::ARRAY_LOADER:
+                return new ArrayLoader($config);
             default:
                 throw new Exception('Driver not found : ' . $driver);
         }
@@ -84,10 +87,8 @@ abstract class ConfigLoader
      */
     protected function defaultHandler($data)
     {
-        foreach ($data as $value) {
-            foreach ($value as $key => $val) {
-                putenv("$key=$val");
-            }
+        foreach ($data as $key => $value) {
+            putenv("$key=$value");
         }
     }
 }
