@@ -10,7 +10,7 @@
  * @link     http://url.com
  */
 
- namespace System\Loader\Config;
+ namespace Loader\Config;
 
 use Exception;
 
