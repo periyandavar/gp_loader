@@ -1,37 +1,33 @@
-name: PHP Unit Tests and SonarCloud Analysis
+name: SonarCloud Analysis
 
-on: [pull_request]
-
+on:
+  - pull_request
+  
 jobs:
-  test:
-    name: Build and analyze
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  tests:
+      name: Tests
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.0' # or your required PHP version
-
-      - name: Install Composer dependencies
-        run: composer install
-
-      - name: Run PHPUnit with Xdebug Coverage
-        run: |
-          $env:XDEBUG_MODE = "coverage"
-          vendor\bin\phpunit --coverage-clover coverage.xml
-
-      - name: Install SonarScanner
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          Invoke-WebRequest -Uri "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-windows.zip" -OutFile "sonar-scanner.zip"
-          Expand-Archive -Path "sonar-scanner.zip" -DestinationPath "C:\sonar-scanner"
-          echo "C:\sonar-scanner\sonar-scanner-4.6.2.2472-windows\bin" >> $GITHUB_PATH
-
-      - name: Run SonarScanner
-        run: |
-          sonar-scanner -Dsonar.projectKey=periyandavar_gp_loader -Dsonar.organization=periyandavar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      runs-on: ubuntu-latest
+      
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+          
+        - name: Setup PHP with Xdebug
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: '8.1'
+            coverage: xdebug
+            
+        - name: Install dependencies with composer
+          run: composer update --no-ansi --no-interaction --no-progress
+          
+        - name: Run tests with phpunit/phpunit
+          run: vendor/bin/phpunit --coverage-clover=coverage.xml
+          
+        - name: SonarQube Scan
+          uses: SonarSource/sonarqube-scan-action@v4
+          env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
