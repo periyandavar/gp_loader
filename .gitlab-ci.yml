@@ -4,6 +4,8 @@ stages:
 
 test:
   stage: test
+  env:
+    XDEBUG_MODE: coverage
   script:
     - ./vendor/bin/phpunit --coverage-clover build/coverage.xml
 
