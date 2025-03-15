@@ -11,7 +11,7 @@ test:
     - composer install
   script:
     - $env:XDEBUG_MODE = "coverage"
-    - vendor/bin/phpunit --coverage-clover coverage.xml --log-junit tests.xml
+    - vendor\bin\phpunit --coverage-clover coverage.xml --log-junit tests.xml
   artifacts:
     paths:
       - coverage.xml

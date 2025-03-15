@@ -21,7 +21,7 @@ jobs:
         run: composer install
       - name: Run tests
         run: |
-          XDEBUG_MODE=coverage vendor\bin\phpunit --coverage-clover coverage.xml
+          $env:XDEBUG_MODE = "coverage" vendor\bin\phpunit --coverage-clover coverage.xml
       - name: SonarCloud Scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
