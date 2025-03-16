@@ -53,4 +53,16 @@ class ConfigLoaderTest extends TestCase
         $this->assertEquals('value2', $loader->get('key2'));
         $this->assertNull($loader->get('key1'));
     }
+
+    public function testGetAll()
+    {
+        $config = ['file' => ''];
+        $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER);
+        $loader->override(['key1' => 'value1', 'key2' => 'value2']);
+        $data = $loader->getAll();
+        $this->assertArrayHasKey('key1', $data);
+        $this->assertEquals('value1', $data['key1']);
+        $this->assertArrayHasKey('key2', $data);
+        $this->assertEquals('value2', $data['key2']);
+    }
 }
