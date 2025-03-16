@@ -30,8 +30,6 @@ abstract class ConfigLoader
 
     protected $loadHandler;
 
-    protected $data = [];
-
     public const ENV_LOADER = 'env';
     public const ARRAY_LOADER = 'array';
 
@@ -48,38 +46,8 @@ abstract class ConfigLoader
 
     public function load()
     {
-        $this->data = $this->innerLoader();
-
-        $this->loadHandler();
-    }
-
-    public function get(string $key)
-    {
-        return $this->data[$key] ?? null;
-    }
-
-    public function getAll()
-    {
-        return $this->data;
-    }
-
-    public function merge(array $data)
-    {
-        $this->data = array_merge($this->data, $data);
-    }
-
-    public function set(string $key, $value, bool $strict = false)
-    {
-        if ($strict && !isset($this->data[$key])) {
-            throw new Exception('Key not found : ' . $key);
-        }
-
-        $this->data[$key] = $value;
-    }
-
-    public function override(array $data)
-    {
-        $this->data = $data;
+        $data = $this->innerLoader();
+        $this->loadHandler($data);
     }
 
     abstract public function innerLoader(): array;
@@ -96,13 +64,13 @@ abstract class ConfigLoader
         }
     }
 
-    private function loadHandler()
+    private function loadHandler($data)
     {
         if ($this->loadHandler) {
-            return call_user_func($this->loadHandler, $this->data);
+            return call_user_func($this->loadHandler, $data);
         }
 
-        $this->defaultHandler($this->data);
+        $this->defaultHandler($data);
     }
 
     public function setLoadHandler(callable $_loadHandler)
