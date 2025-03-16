@@ -16,4 +16,18 @@ class ArrayLoaderTest extends TestCase
         $val = reset($data);
         $this->assertEquals(getenv($key), $val);
     }
+
+    public function testHandler()
+    {
+        $handler_called = false;
+        $callable = function ($data) use (&$handler_called) {
+            $handler_called = true;
+            return 'handler';
+        };
+        $file = __DIR__ . '/../fixture/array_test.php';
+        $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, ['file' => $file]);
+        $loader->setLoadHandler($callable);
+        $loader->load();
+        $this->assertTrue($handler_called);
+    }
 }

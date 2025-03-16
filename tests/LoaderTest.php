@@ -68,7 +68,7 @@ class LoaderTest extends TestCase
         eval('namespace Test\Model; class TestModel {}');
 
         // Call the autoLoadClass method to load the model
-        Loader::autoLoadClass($mockCtrl, ['model' => ['Test']]);
+        Loader::autoLoadClass($mockCtrl, ['model' => 'Test']);
 
         // Assert that the model was loaded correctly
         $this->assertInstanceOf('Test\Model\TestModel', $mockCtrl->test);
@@ -153,7 +153,7 @@ class LoaderTest extends TestCase
         $this->assertTrue(function_exists('testHelper2'));
         $this->assertEquals('Helper Loaded', testHelper2());
 
-        unlink($helperFile);
+        @unlink($helperFile);
     }
 
     public function testHelperFailure()
