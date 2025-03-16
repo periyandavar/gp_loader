@@ -14,9 +14,6 @@
 namespace Loader;
 
 use Exception;
-use Loader\Config\ArrayLoader;
-use Loader\Config\ConfigLoader;
-use PSpell\Config;
 use System\Core\FrameworkException;
 use System\Core\SysController;
 use System\Core\Utility;
@@ -39,7 +36,7 @@ class Loader
      */
     protected static $instance = null;
 
-    protected static $prefixes = [];
+    private $prefixes = [];
     /**
      * Controller object
      *
@@ -50,27 +47,17 @@ class Loader
     /**
      * Instantiate the the Loader instance
      */
-    private function __construct(?ConfigLoader $_config = null)
+    private function __construct()
     {
-        $default_config = [
-            'model' => "App\Model\\",
-            'service' => "App\Service\\",
-            'helper' => "App\Helper\\",
-            'library' => "System\Library\\",
+        global $config;
+        $this->prefixes = [
+            'model' => $config['model'] ?? "App\Model\\",
+            'service' => $config['service'] ?? "App\Service\\",
+            'helper' => $config['helper'] ?? "App\Helper\\",
+            'library' => $config['library'] ?? "System\Library\\",
         ];
-        $config = $_config ? $_config->getAll() : $default_config;
-        $config = array_merge($default_config, $config);
-
-        foreach ($config as $key => $value) {
-            self::$prefixes[$key] = $value;
-        }
 
         $this->loadAll('src/app/config/routes');
-    }
-
-    public static function setPrefixes(array $prefixes)
-    {
-        self::$prefixes = $prefixes;
     }
 
     /**
@@ -83,11 +70,13 @@ class Loader
      */
     public static function autoLoadClass($ctrl, $autoloads): Loader
     {
-        $loads = array_keys(self::$prefixes);
+        global $autoload;
+        $autoloads = $autoloads ?? $autoload;
+        $loads = ['model', 'service', 'library', 'helper'];
         static::$instance ?? static::intialize();
         static::$ctrl = $ctrl;
         foreach ($loads as $load) {
-            $files = $autoloads[$load] ?? [];
+            $files = $autoloads[$load];
             if (! is_array($files)) {
                 $files = [$files];
             }
@@ -106,7 +95,7 @@ class Loader
      */
     public function model(...$models)
     {
-        $ns = self::$prefixes['model'];
+        $ns = $this->prefixes['model'];
         foreach ($models as $model) {
             $class = $ns . $model . 'Model';
             if (class_exists($class)) {
@@ -129,14 +118,14 @@ class Loader
      */
     public function service(...$services)
     {
-        $ns = self::$prefixes['service'];
+        $ns = $this->prefixes['service'];
         foreach ($services as $service) {
             $class = $ns . $service . 'Service';
             if (class_exists($class)) {
                 static::$ctrl->{lcfirst($service)} = new $class();
             } else {
                 throw new Exception(
-                    "Unable to loacate the '$service' class [$class]"
+                    "Unable to loacate the '$service' class"
                 );
             }
         }
@@ -152,7 +141,7 @@ class Loader
      */
     public function library(...$libraries)
     {
-        $ns = self::$prefixes['library'];
+        $ns = $this->prefixes['library'];
         foreach ($libraries as $library) {
             $sys_lib_class = 'System\\Library\\' . $library;
             $cust_lib_class = $ns . $library;
@@ -161,7 +150,7 @@ class Loader
             } elseif (class_exists($cust_lib_class)) {
                 static::$ctrl->{lcfirst($library)} = new $cust_lib_class();
             } else {
-                throw new Exception("Library class '$library' not found [$sys_lib_class, $cust_lib_class]");
+                throw new Exception("Library class '$library' not found");
             }
         }
     }
@@ -177,15 +166,13 @@ class Loader
     public function helper(...$helpers)
     {
         foreach ($helpers as $helper) {
-            // $helper_file = '/src/system/helper/' . $helper . '.php';
-            $helper_file = trim(rtrim(self::$prefixes['helper'], '\\') . '/' . $helper) . '.php';
-            $helper_class = self::$prefixes['helper'] . $helper;
-            if (class_exists($helper_class)) {
+            $helper_file = '/src/system/helper/' . $helper . '.php';
+            if (class_exists($this->prefixes['helper'] . $helper)) {
                 //
             } elseif (file_exists($helper_file)) {
                 include_once $helper_file;
             } else {
-                throw new Exception("Helper class '$helper' not found [$helper_class, $helper_file]");
+                throw new Exception("Helper class '$helper' not found");
             }
         }
     }

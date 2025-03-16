@@ -9,7 +9,7 @@ class ArrayLoaderTest extends TestCase
 {
     public function testArrayLoader()
     {
-        $file = __DIR__ . '/../fixture/array_test.php';
+        $file = __DIR__ . '/fixture/array_test.php';
         ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, ['file' => $file])->load();
         $data = require $file;
         $key = array_key_first($data);

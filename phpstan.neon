@@ -2,6 +2,7 @@ parameters:
     level: 5  # Set the level of analysis (0 to 8, 5 is a good balance)
     paths:
         - %currentWorkingDirectory%/src  # Adjust this path to your source code directory
+        - %currentWorkingDirectory%/tests  # Include your tests directory if applicable
     excludePaths:
         - %currentWorkingDirectory%/vendor  # Exclude vendor directory from analysis
 

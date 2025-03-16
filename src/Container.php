@@ -78,8 +78,7 @@ class Container
      */
     public static function getService(string $_name)
     {
-        $name = strtolower($_name);
-        $service = self::$services[$name] ?? null;
+        $service = self::$services[$_name] ?? null;
 
         if (is_callable($service)) {
             return $service();
