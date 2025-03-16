@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="vendor/autoload.php">
-    <coverage>
+    <coverage processUncoveredFiles="true">
         <include>
             <directory>./src</directory> <!-- Adjust the path to your source code -->
         </include>
         <exclude>
             <directory>./vendor</directory> <!-- Exclude vendor directory -->
-            <directory>./tests</directory> <!-- Exclude vendor directory -->
         </exclude>
+        <exclude>
+            <directory>./tests</directory> <!-- Exclude tests directory -->
+        </exclude>
+        <report>
+            <clover outputFile="coverage.xml"/>
+        </report>
     </coverage>
     <testsuites>
         <testsuite name="My Project Test Suite">
