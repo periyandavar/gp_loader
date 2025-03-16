@@ -7,6 +7,9 @@
         <exclude>
             <directory>./vendor</directory> <!-- Exclude vendor directory -->
         </exclude>
+        <exclude>
+            <directory>./tests</directory> <!-- Exclude vendor directory -->
+        </exclude>
     </coverage>
     <testsuites>
         <testsuite name="My Project Test Suite">
