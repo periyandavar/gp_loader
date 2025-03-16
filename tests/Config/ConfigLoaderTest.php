@@ -54,7 +54,6 @@ class ConfigLoaderTest extends TestCase
         $this->assertNull($loader->get('key1'));
     }
 
-    
     public function testGetAll()
     {
         $config = ['file' => ''];

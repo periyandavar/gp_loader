@@ -20,8 +20,9 @@ class ArrayLoaderTest extends TestCase
     public function testHandler()
     {
         $handler_called = false;
-        $callable = function ($data) use (&$handler_called) {
+        $callable = function($data) use (&$handler_called) {
             $handler_called = true;
+
             return 'handler';
         };
         $file = __DIR__ . '/../fixture/array_test.php';
