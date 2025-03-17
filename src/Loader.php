@@ -1,30 +1,10 @@
 <?php
 
-/**
- * Loader
- * php version 7.3.5
- *
- * @category Loader
- * @package  Core
- * @author   Periyandavar <periyandavar@gmail.com>
- * @license  http://license.com license
- * @link     http://url.com
- */
-
 namespace Loader;
 
 use Loader\Config\ConfigLoader;
 use Loader\Exception\LoaderException;
 
-/**
- * Loader Class autoloads the files
- *
- * @category Loader
- * @package  Core
- * @author   Periyandavar <periyandavar@gmail.com>
- * @license  http://license.com license
- * @link     http://url.com
- */
 class Loader
 {
     /**

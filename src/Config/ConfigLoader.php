@@ -1,29 +1,9 @@
 <?php
 
-/**
- * EnvParser
- * php version 7.3.5
- *
- * @category EnvParser
- * @package  Core
- * @author   Periyandavar <periyandavar@gmail.com>
- * @license  http://license.com license
- * @link     http://url.com
- */
-
 namespace Loader\Config;
 
 use Loader\Exception\LoaderException;
 
-/**
- * EnvParser parse the env files and loads values from it
- *
- * @category EnvParser
- * @package  Core
- * @author   Periyandavar <periyandavar@gmail.com>
- * @license  http://license.com license
- * @link     http://url.com
- */
 abstract class ConfigLoader
 {
     protected $config;
