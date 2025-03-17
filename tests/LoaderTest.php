@@ -2,7 +2,7 @@
 
 namespace Test\Loader;
 
-use Exception;
+use Loader\Exception\LoaderException;
 use Loader\Loader;
 use PHPUnit\Framework\TestCase;
 
@@ -76,7 +76,7 @@ class LoaderTest extends TestCase
 
     public function testModelFailure()
     {
-        $this->expectException(Exception::class);
+        $this->expectException(LoaderException::class);
         $this->expectExceptionMessage("Unable to locate the model class 'NonExistent'");
 
         $mockCtrl = new class() {};
@@ -114,7 +114,7 @@ class LoaderTest extends TestCase
 
     public function testLibraryFailure()
     {
-        $this->expectException(Exception::class);
+        $this->expectException(LoaderException::class);
         $this->expectExceptionMessage("Library class 'NonExistent' not found");
 
         $mockCtrl = new class() {};
@@ -158,7 +158,7 @@ class LoaderTest extends TestCase
 
     public function testHelperFailure()
     {
-        $this->expectException(Exception::class);
+        $this->expectException(LoaderException::class);
         $this->expectExceptionMessage("Helper class 'NonExistentHelper' not found");
 
         // Attempt to load a non-existent helper

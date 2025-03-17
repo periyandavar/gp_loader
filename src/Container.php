@@ -6,7 +6,6 @@ use Loader\Exception\LoaderException;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
-use System\Core\Log;
 
 class Container
 {
