@@ -30,7 +30,7 @@ class LoaderTest extends TestCase
         file_put_contents($file, '<?php return true;');
         $result = $this->loader->loadFile($file);
         $this->assertTrue($result);
-        unlink($file);
+        @unlink($file);
     }
 
     public function testLoadFileFailure()

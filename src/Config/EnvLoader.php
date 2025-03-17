@@ -13,7 +13,7 @@
 
 namespace Loader\Config;
 
-use Exception;
+use Loader\Exception\LoaderException;
 
 /**
  * EnvParser parse the env files and loads values from it
@@ -35,10 +35,10 @@ class EnvLoader extends ConfigLoader
     {
         $file = $this->config['file'] ?? '';
         if (empty($file)) {
-            throw new Exception('env file not configured');
+            throw new LoaderException('env file not configured', LoaderException::FILE_NOT_FOUND_ERROR);
         }
         if (! (file_exists($file))) {
-            throw new Exception('env file not found : ' . $file);
+            throw new LoaderException('env file not found : ' . $file, LoaderException::FILE_NOT_FOUND_ERROR);
         }
         $data = [];
         $contents = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

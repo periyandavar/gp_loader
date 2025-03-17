@@ -1,7 +1,6 @@
 <?php
 
 use Loader\Config\ConfigLoader;
-use Loader\Config\EnvLoader;
 use PHPUnit\Framework\TestCase;
 
 class EnvLoaderTest extends TestCase

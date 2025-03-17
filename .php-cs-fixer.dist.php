@@ -13,6 +13,7 @@ return (new Config())
         '@PSR2' => true, // Use PSR-2 coding style
         '@PSR12' => true, // Use PSR-2 coding style
         'array_syntax' => ['syntax' => 'short'], // Use short array syntax
+        'no_unused_imports' => true,
        'binary_operator_spaces' => [
             'default' => 'single_space', // Default spacing for binary operators
         ],

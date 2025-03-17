@@ -2,7 +2,7 @@
 
 namespace Loader;
 
-use Exception;
+use Loader\Exception\LoaderException;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -101,7 +101,7 @@ class Container
         $object = self::getInstance($name) ?? self::getService($_name);
 
         if (is_null($object)) {
-            throw new Exception("Service not found: {$_name}");
+            throw new LoaderException("Service not found: {$_name}", LoaderException::CLASS_NOT_FOUND_ERROR);
         }
 
         return $object;
@@ -132,8 +132,6 @@ class Container
     {
         $reflection = new ReflectionClass($_class_name);
         if ($reflection->isAbstract() || $reflection->isInterface()) {
-            // Log::getInstance()->info("{$_class_name} is abstract or interface");
-
             return null;
         }
 
