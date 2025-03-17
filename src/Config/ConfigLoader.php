@@ -13,7 +13,7 @@
 
 namespace Loader\Config;
 
-use Exception;
+use Loader\Exception\LoaderException;
 
 /**
  * EnvParser parse the env files and loads values from it
@@ -71,7 +71,7 @@ abstract class ConfigLoader
     public function set(string $key, $value, bool $strict = false)
     {
         if ($strict && !isset($this->data[$key])) {
-            throw new Exception('Key not found : ' . $key);
+            throw new LoaderException('Key not found : ' . $key, LoaderException::CONFIG_NOT_FOUND_ERROR);
         }
 
         $this->data[$key] = $value;
@@ -92,7 +92,7 @@ abstract class ConfigLoader
             case self::ARRAY_LOADER:
                 return new ArrayLoader($config);
             default:
-                throw new Exception('Driver not found : ' . $driver);
+                throw new LoaderException('Driver not found : ' . $driver, LoaderException::LOADER_DRIVER_NOT_FOUND_ERROR);
         }
     }
 

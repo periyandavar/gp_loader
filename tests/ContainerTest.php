@@ -2,8 +2,8 @@
 
 namespace Test\Loader;
 
-use Exception;
 use Loader\Container;
+use Loader\Exception\LoaderException;
 use PHPUnit\Framework\TestCase;
 
 class ContainerTest extends TestCase
@@ -93,7 +93,7 @@ class ContainerTest extends TestCase
 
     public function testGetNonExistentService()
     {
-        $this->expectException(Exception::class);
+        $this->expectException(LoaderException::class);
         $this->expectExceptionMessage('Service not found: nonExistentService');
 
         // Attempt to retrieve a non-existent service
