@@ -1,9 +1,8 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
-use Loader\Config\ArrayLoader;
 use Loader\Config\ConfigLoader;
 use Loader\Exception\LoaderException;
+use PHPUnit\Framework\TestCase;
 
 class ArrayLoaderTest extends TestCase
 {
