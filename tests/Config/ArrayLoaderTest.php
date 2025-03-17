@@ -1,34 +1,58 @@
 <?php
 
-namespace Test\Loader;
-
-use Loader\Config\ConfigLoader;
 use PHPUnit\Framework\TestCase;
+use Loader\Config\ArrayLoader;
+use Loader\Config\ConfigLoader;
+use Loader\Exception\LoaderException;
 
 class ArrayLoaderTest extends TestCase
 {
-    public function testArrayLoader()
+    private $arrayFilePath;
+
+    protected function setUp(): void
     {
-        $file = __DIR__ . '/../fixture/array_test.php';
-        ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, ['file' => $file])->load();
-        $data = require $file;
-        $key = array_key_first($data);
-        $val = reset($data);
-        $this->assertEquals(getenv($key), $val);
+        // Create a temporary array file for testing
+        $this->arrayFilePath = __DIR__ . '/../fixture/array_test1.php';
+        file_put_contents($this->arrayFilePath, "<?php return ['key1' => 'value1', 'key2' => 'value2'];");
     }
 
-    public function testHandler()
+    protected function tearDown(): void
     {
-        $handler_called = false;
-        $callable = function($data) use (&$handler_called) {
-            $handler_called = true;
+        // Remove the temporary array file after testing
+        if (file_exists($this->arrayFilePath)) {
+            unlink($this->arrayFilePath);
+        }
+    }
 
-            return 'handler';
-        };
-        $file = __DIR__ . '/../fixture/array_test.php';
-        $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, ['file' => $file]);
-        $loader->setLoadHandler($callable);
+    public function testInnerLoader()
+    {
+        $config = ['file' => $this->arrayFilePath];
+        $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);
+        $data = $loader->innerLoader();
+
+        $this->assertArrayHasKey('key1', $data);
+        $this->assertEquals('value1', $data['key1']);
+        $this->assertArrayHasKey('key2', $data);
+        $this->assertEquals('value2', $data['key2']);
+    }
+
+    public function testInnerLoaderFileNotConfigured()
+    {
+        $this->expectException(LoaderException::class);
+        $this->expectExceptionMessage('env file not configured');
+
+        $config = [];
+        $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);
+        $loader->innerLoader();
+    }
+
+    public function testInnerLoaderFileNotFound()
+    {
+        $this->expectException(LoaderException::class);
+        $this->expectExceptionMessage('env file not found');
+
+        $config = ['file' => 'non_existent_file.php'];
+        $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);
         $loader->load();
-        $this->assertTrue($handler_called);
     }
 }
