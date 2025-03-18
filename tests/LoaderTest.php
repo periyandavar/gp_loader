@@ -137,7 +137,7 @@ class LoaderTest extends TestCase
 
         $this->assertTrue(condition: function_exists('testHelper'));
 
-        unlink($helperFile);
+        @unlink($helperFile);
     }
 
     public function testHelperMethodSuccess()

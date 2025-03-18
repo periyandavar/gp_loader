@@ -19,7 +19,7 @@ class EnvLoaderTest extends TestCase
     {
         // Remove the temporary .env file after testing
         if (file_exists($this->envFilePath)) {
-            unlink($this->envFilePath);
+            @unlink($this->envFilePath);
         }
     }
 

@@ -33,17 +33,28 @@ class Container
      * Resolve the dependency.
      *
      * @param ReflectionParameter $_param
+     * @param array               $data
      *
      * @return mixed
      */
-    private static function resolveDependency(ReflectionParameter $_param)
+    private static function resolveDependency(ReflectionParameter $_param, array $data = [])
     {
         $type = $_param->getType();
 
-        if ($type instanceof ReflectionNamedType && ! $type->isBuiltin()) {
-            $name = $type->getName();
+        $param_name = $_param->getName();
+        if (isset($data[$param_name])) {
+            return $data[$param_name];
+        }
 
-            return self::isClassRegistered($name) ? self::get($name) : self::resolve($name);
+        if ($type instanceof ReflectionNamedType) {
+            $name = $type->getName();
+            if (isset($data[$name])) {
+                return $data[$name];
+            }
+
+            if (! $type->isBuiltin()) {
+                return self::isClassRegistered($name) ? self::get($name) : self::resolve($name);
+            }
         }
 
         if ($_param->isDefaultValueAvailable()) {
@@ -127,7 +138,15 @@ class Container
      *
      * @return mixed
      */
-    public static function resolve(string $_class_name)
+    public static function resolve(string $_class_name, array $data = [])
+    {
+        $reflection = new ReflectionClass($_class_name);
+        $dependencies = self::getConstrParams($_class_name, $data);
+
+        return $reflection->newInstanceArgs($dependencies);
+    }
+
+    public static function getConstrParams(string $_class_name, $data)
     {
         $reflection = new ReflectionClass($_class_name);
         if ($reflection->isAbstract() || $reflection->isInterface()) {
@@ -140,10 +159,10 @@ class Container
 
         $dependencies = [];
         foreach ($params as $param) {
-            $dependencies[] = self::resolveDependency($param);
+            $dependencies[] = self::resolveDependency($param, $data);
         }
 
-        return $reflection->newInstanceArgs($dependencies);
+        return $dependencies;
     }
 
     /**
@@ -166,6 +185,8 @@ class Container
             };
             self::set($name, $closure, $singleton);
         }
+
+        return self::class;
     }
 
     /**
@@ -214,5 +235,19 @@ class Container
         }
 
         return $params;
+    }
+
+    public static function resolveMethod(string $class, string $method, array $data)
+    {
+        $reflection = new ReflectionClass($class);
+        $method = $reflection->getMethod($method);
+        $params = $method->getParameters();
+
+        $dependencies = [];
+        foreach ($params as $param) {
+            $dependencies[] = self::resolveDependency($param, $data);
+        }
+
+        return $dependencies;
     }
 }
