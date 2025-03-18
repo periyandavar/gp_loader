@@ -99,4 +99,31 @@ class ContainerTest extends TestCase
         // Attempt to retrieve a non-existent service
         Container::get('nonExistentService');
     }
+
+    public function testResolveMethod()
+    {
+        // Define a test class with a method that has dependencies
+        $class = TestMethodClass::class;
+        $method = 'testMethod';
+        $data = [
+            'param1' => 'value1',
+            'param2' => 'value2',
+        ];
+
+        // Resolve the method dependencies
+        $dependencies = Container::resolveMethod($class, $method, $data);
+
+        // Assert that the resolved dependencies match the provided data
+        $this->assertCount(2, $dependencies);
+        $this->assertEquals('value1', $dependencies[0]);
+        $this->assertEquals('value2', $dependencies[1]);
+    }
+}
+
+class TestMethodClass
+{
+    public function testMethod(string $param1, string $param2)
+    {
+        return $param1 . ' ' . $param2;
+    }
 }
