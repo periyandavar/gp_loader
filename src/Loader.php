@@ -13,13 +13,8 @@
 
 namespace Loader;
 
-use Exception;
-use Loader\Config\ArrayLoader;
 use Loader\Config\ConfigLoader;
-use PSpell\Config;
-use System\Core\FrameworkException;
-use System\Core\SysController;
-use System\Core\Utility;
+use Loader\Exception\LoaderException;
 
 /**
  * Loader Class autoloads the files
@@ -112,8 +107,9 @@ class Loader
             if (class_exists($class)) {
                 static::$ctrl->{lcfirst($model)} = new $class();
             } else {
-                throw new Exception(
-                    "Unable to locate the model class '$model'"
+                throw new LoaderException(
+                    "Unable to locate the model class '$model'",
+                    LoaderException::CLASS_NOT_FOUND_ERROR
                 );
             }
         }
@@ -125,7 +121,7 @@ class Loader
      * @param string ...$services Service list
      *
      * @return void
-     * @throws Exception
+     * @throws LoaderException
      */
     public function service(...$services)
     {
@@ -135,8 +131,9 @@ class Loader
             if (class_exists($class)) {
                 static::$ctrl->{lcfirst($service)} = new $class();
             } else {
-                throw new Exception(
-                    "Unable to loacate the '$service' class [$class]"
+                throw new LoaderException(
+                    "Unable to loacate the '$service' class [$class]",
+                    LoaderException::CLASS_NOT_FOUND_ERROR
                 );
             }
         }
@@ -148,7 +145,7 @@ class Loader
      * @param string ...$libraries Library list
      *
      * @return void
-     * @throws Exception
+     * @throws LoaderException
      */
     public function library(...$libraries)
     {
@@ -161,7 +158,8 @@ class Loader
             } elseif (class_exists($cust_lib_class)) {
                 static::$ctrl->{lcfirst($library)} = new $cust_lib_class();
             } else {
-                throw new Exception("Library class '$library' not found [$sys_lib_class, $cust_lib_class]");
+                throw new LoaderException("Library class '$library' not found [$sys_lib_class, $cust_lib_class]",
+                    LoaderException::CLASS_NOT_FOUND_ERROR);
             }
         }
     }
@@ -172,20 +170,19 @@ class Loader
      * @param string ...$helpers Helper list
      *
      * @return void
-     * @throws Exception
+     * @throws LoaderException
      */
     public function helper(...$helpers)
     {
         foreach ($helpers as $helper) {
-            // $helper_file = '/src/system/helper/' . $helper . '.php';
             $helper_file = trim(rtrim(self::$prefixes['helper'], '\\') . '/' . $helper) . '.php';
             $helper_class = self::$prefixes['helper'] . $helper;
             if (class_exists($helper_class)) {
-                //
+                continue;
             } elseif (file_exists($helper_file)) {
                 include_once $helper_file;
             } else {
-                throw new Exception("Helper class '$helper' not found [$helper_class, $helper_file]");
+                throw new LoaderException("Helper class '$helper' not found [$helper_class, $helper_file]", LoaderException::CLASS_OR_FILE_NOT_FOUND_ERROR);
             }
         }
     }

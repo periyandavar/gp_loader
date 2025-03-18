@@ -1,7 +1,7 @@
 <?php
 
 use Loader\Config\ConfigLoader;
-use Loader\Config\EnvLoader;
+use Loader\Exception\LoaderException;
 use PHPUnit\Framework\TestCase;
 
 class EnvLoaderTest extends TestCase
@@ -37,7 +37,7 @@ class EnvLoaderTest extends TestCase
 
     public function testInnerLoaderFileNotConfigured()
     {
-        $this->expectException(Exception::class);
+        $this->expectException(LoaderException::class);
         $this->expectExceptionMessage('env file not configured');
 
         $config = [];
@@ -47,7 +47,7 @@ class EnvLoaderTest extends TestCase
 
     public function testInnerLoaderFileNotFound()
     {
-        $this->expectException(Exception::class);
+        $this->expectException(LoaderException::class);
         $this->expectExceptionMessage('env file not found');
 
         $config = ['file' => 'non_existent_file.env'];
