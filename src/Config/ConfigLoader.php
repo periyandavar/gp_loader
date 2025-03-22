@@ -26,6 +26,7 @@ use Loader\Exception\LoaderException;
  */
 abstract class ConfigLoader
 {
+    private static $instances = [];
     protected $config;
 
     protected $loadHandler;
@@ -34,6 +35,7 @@ abstract class ConfigLoader
 
     public const ENV_LOADER = 'env';
     public const ARRAY_LOADER = 'array';
+    public const VALUE_LOADER = 'value';
 
     /**
      * Instantitate the new EnvParser Instance
@@ -51,6 +53,8 @@ abstract class ConfigLoader
         $this->data = $this->innerLoader();
 
         $this->loadHandler();
+
+        return $this;
     }
 
     public function get(string $key)
@@ -66,6 +70,8 @@ abstract class ConfigLoader
     public function merge(array $data)
     {
         $this->data = array_merge($this->data, $data);
+
+        return $this;
     }
 
     public function set(string $key, $value, bool $strict = false)
@@ -75,25 +81,40 @@ abstract class ConfigLoader
         }
 
         $this->data[$key] = $value;
+
+        return $this;
     }
 
     public function override(array $data)
     {
         $this->data = $data;
+
+        return $this;
     }
 
     abstract public function innerLoader(): array;
 
-    public static function getInstance($driver, $config = [])
+    public static function getInstance($driver, $config = [], $name = ''): ConfigLoader
     {
         switch ($driver) {
             case self::ENV_LOADER:
-                return new EnvLoader($config);
+                $instance = new EnvLoader($config);
+                break;
             case self::ARRAY_LOADER:
-                return new ArrayLoader($config);
+                $instance = new ArrayLoader($config);
+                break;
+            case self::VALUE_LOADER:
+                $instance = new ValueLoader($config);
+                break;
             default:
                 throw new LoaderException('Driver not found : ' . $driver, LoaderException::LOADER_DRIVER_NOT_FOUND_ERROR);
         }
+
+        if (! empty($name)) {
+            self::$instances[$name] = $instance;
+        }
+
+        return $instance;
     }
 
     private function loadHandler()
@@ -120,5 +141,16 @@ abstract class ConfigLoader
         foreach ($data as $key => $value) {
             putenv("$key=$value");
         }
+    }
+
+    /**
+     * Get Config
+     *
+     * @param  string       $name
+     * @return ConfigLoader
+     */
+    public static function getConfig(string $name)
+    {
+        return self::$instances[$name];
     }
 }

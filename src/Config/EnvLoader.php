@@ -46,6 +46,9 @@ class EnvLoader extends ConfigLoader
             if (strpos(trim($line), '#') !== false) {
                 continue;
             }
+            if (trim($line) === '') {
+                continue;
+            }
             list($key, $value) = explode('=', $line, 2);
 
             // Create the array
