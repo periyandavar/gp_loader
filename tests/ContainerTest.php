@@ -115,8 +115,8 @@ class ContainerTest extends TestCase
 
         // Assert that the resolved dependencies match the provided data
         $this->assertCount(2, $dependencies);
-        $this->assertEquals('value1', $dependencies[0]);
-        $this->assertEquals('value2', $dependencies[1]);
+        $this->assertEquals('value1', $dependencies['param1']);
+        $this->assertEquals('value2', $dependencies['param2']);
     }
 }
 

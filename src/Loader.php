@@ -59,8 +59,6 @@ class Loader
         foreach ($config as $key => $value) {
             self::$prefixes[$key] = $value;
         }
-
-        $this->loadAll('src/app/config/routes');
     }
 
     public static function setPrefixes(array $prefixes)
@@ -76,19 +74,21 @@ class Loader
      *
      * @return Loader
      */
-    public static function autoLoadClass($ctrl, $autoloads): Loader
+    public static function autoLoadClass($ctrl, $autoloads, ?ConfigLoader $config = null): Loader
     {
         $loads = array_keys(self::$prefixes);
-        static::$instance ?? static::intialize();
+        static::$instance ?? static::intialize($config);
         static::$ctrl = $ctrl;
         foreach ($loads as $load) {
             $files = $autoloads[$load] ?? [];
             if (! is_array($files)) {
                 $files = [$files];
             }
+
             static::$instance->$load(...$files);
         }
 
+        // exit;
         return static::$instance;
     }
 
@@ -175,6 +175,9 @@ class Loader
     public function helper(...$helpers)
     {
         foreach ($helpers as $helper) {
+            if (class_exists($helper)) {
+                continue;
+            }
             $helper_file = trim(rtrim(self::$prefixes['helper'], '\\') . '/' . $helper) . '.php';
             $helper_class = self::$prefixes['helper'] . $helper;
             if (class_exists($helper_class)) {
@@ -194,7 +197,7 @@ class Loader
      *
      * @return void
      */
-    public function loadAll(string $dir)
+    public static function loadAll(string $dir)
     {
         foreach (glob("$dir/*.php") as $filename) {
             include_once $filename;
@@ -226,10 +229,10 @@ class Loader
      *
      * @return Loader
      */
-    public static function intialize(): Loader
+    public static function intialize(?ConfigLoader $config = null): Loader
     {
         if (self::$instance == null) {
-            self::$instance = new self();
+            self::$instance = new self($config);
         }
 
         return self::$instance;
