@@ -245,7 +245,7 @@ class Container
 
         $dependencies = [];
         foreach ($params as $param) {
-            $dependencies[] = self::resolveDependency($param, $data);
+            $dependencies[$param->getName()] = self::resolveDependency($param, $data);
         }
 
         return $dependencies;
