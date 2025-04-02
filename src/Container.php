@@ -211,14 +211,14 @@ class Container
         $params = [];
 
         foreach ($_params as $param => $value) {
-            if (is_object($value)) {
-                $params[$param] = $value;
+            if (is_callable($value)) {
+                $params[$param] = call_user_func($value);
 
                 continue;
             }
 
-            if (is_callable($value)) {
-                $params[$param] = $value();
+            if (is_object($value)) {
+                $params[$param] = $value;
 
                 continue;
             }
