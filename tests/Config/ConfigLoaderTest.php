@@ -56,7 +56,6 @@ class ConfigLoaderTest extends TestCase
 
     public function testGetAll()
     {
-        $config = ['file' => ''];
         $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER);
         $loader->override(['key1' => 'value1', 'key2' => 'value2']);
         $data = $loader->getAll();
