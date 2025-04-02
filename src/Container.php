@@ -37,7 +37,7 @@ class Container
      *
      * @return mixed
      */
-    private static function resolveDependency(ReflectionParameter $_param, array $data = [])
+    public static function resolveDependency(ReflectionParameter $_param, array $data = [])
     {
         $type = $_param->getType();
 

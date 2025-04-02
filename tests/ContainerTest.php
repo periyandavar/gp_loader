@@ -181,7 +181,6 @@ class ContainerTest extends TestCase
     {
         $reflection = new ReflectionClass(Container::class);
         $method = $reflection->getMethod('resolveDependency');
-        $method->setAccessible(true);
 
         $paramMock = $this->createMock(ReflectionParameter::class);
         $paramMock->method('getName')->willReturn('param1');
@@ -196,7 +195,6 @@ class ContainerTest extends TestCase
     {
         $reflection = new ReflectionClass(Container::class);
         $method = $reflection->getMethod('resolveDependency');
-        $method->setAccessible(true);
 
         $paramMock = $this->createMock(ReflectionParameter::class);
         $typeMock = $this->createMock(ReflectionNamedType::class);
@@ -214,7 +212,6 @@ class ContainerTest extends TestCase
     {
         $reflection = new ReflectionClass(Container::class);
         $method = $reflection->getMethod('resolveDependency');
-        $method->setAccessible(true);
 
         $paramMock = $this->createMock(ReflectionParameter::class);
         $paramMock->method('isDefaultValueAvailable')->willReturn(true);
@@ -229,7 +226,6 @@ class ContainerTest extends TestCase
     {
         $reflection = new ReflectionClass(Container::class);
         $method = $reflection->getMethod('resolveDependency');
-        $method->setAccessible(true);
 
         $paramMock = $this->createMock(ReflectionParameter::class);
         $paramMock->method('getName')->willReturn('param1');
@@ -271,7 +267,6 @@ class ContainerTest extends TestCase
         // Use Reflection to mock the resolveDependency method
         $reflection = new ReflectionClass(Container::class);
         $resolveDependencyMethod = $reflection->getMethod('resolveDependency');
-        $resolveDependencyMethod->setAccessible(true);
 
         // Call the getConstrParams method
         $result = Container::getConstrParams(TestClass::class, ['param1' => 'value1', 'param2' => 'value2']);
@@ -290,7 +285,6 @@ class ContainerTest extends TestCase
 
         // Use Reflection to access the private/protected resolveDependency method
         $reflection = new ReflectionMethod(Container::class, 'resolveDependency');
-        $reflection->setAccessible(true);
 
         // Mock a ReflectionParameter
         $paramMock = $this->createMock(ReflectionParameter::class);
@@ -383,6 +377,24 @@ class ContainerTest extends TestCase
         // Assert that the regular string is also returned as-is
         $this->assertArrayHasKey('param2', $resolvedParams);
         $this->assertEquals('RegularString', $resolvedParams['param2']);
+    }
+
+    public function testInterfaceResolve()
+    {
+        $this->assertNull(Container::getConstrParams(InterfaceDependency::class, []));
+    }
+
+    public function testResolveDependency()
+    {
+        $reflection = new ReflectionClass(TesterClass::class);
+        $cons = $reflection->getConstructor();
+        $param1 = $cons->getParameters();
+        $param1 = reset($param1);
+        $dep = new ConcreteDependency();
+        $res = Container::resolveDependency($param1, [
+            'abstractDep' => $dep,
+        ]);
+        $this->assertEquals($res, $dep);
     }
 }
 
