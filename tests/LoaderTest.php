@@ -24,7 +24,7 @@ class LoaderTest extends TestCase
     public function testLoadFileSuccess()
     {
         $file = __DIR__ . '/fixture/sample.php';
-        if (!is_dir(__DIR__ . '/fixture')) {
+        if (! is_dir(__DIR__ . '/fixture')) {
             mkdir(__DIR__ . '/fixture');
         }
         file_put_contents($file, '<?php return true;');
@@ -126,7 +126,7 @@ class LoaderTest extends TestCase
     public function testHelperSuccess()
     {
         $dir = __DIR__ . '/fixture';
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir);
         }
         $helperFile = "$dir/testHelper1.php";

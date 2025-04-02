@@ -173,15 +173,25 @@ class Container
     public static function loadFromConfig(array $_config)
     {
         foreach ($_config as $name => $config) {
+            if (is_string($config)) {
+                $config = ['class' => $config];
+            }
+            $class = $config['class'] ?? $config[0] ?? '';
+            if (empty($class)) {
+                continue;
+            }
+            if (is_numeric($name)) {
+                $name = $class;
+            }
             $singleton = $config['singleton'] ?? false;
-            $closure = function() use ($config) {
-                if ($config['params']) {
+            $closure = function() use ($config, $class) {
+                if (isset($config['params'])) {
                     $params = self::getClassParams($config['params']);
 
-                    return new $config['class'](...$params);
+                    return new $class(...$params);
                 }
 
-                return new $config['class']();
+                return self::resolve($class);
             };
             self::set($name, $closure, $singleton);
         }
@@ -231,7 +241,7 @@ class Container
                 continue;
             }
 
-            $_params[$param] = $value;
+            $params[$param] = $value;
         }
 
         return $params;

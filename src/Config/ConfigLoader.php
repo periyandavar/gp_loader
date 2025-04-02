@@ -76,7 +76,7 @@ abstract class ConfigLoader
 
     public function set(string $key, $value, bool $strict = false)
     {
-        if ($strict && !isset($this->data[$key])) {
+        if ($strict && ! isset($this->data[$key])) {
             throw new LoaderException('Key not found : ' . $key, LoaderException::CONFIG_NOT_FOUND_ERROR);
         }
 
@@ -99,12 +99,15 @@ abstract class ConfigLoader
         switch ($driver) {
             case self::ENV_LOADER:
                 $instance = new EnvLoader($config);
+
                 break;
             case self::ARRAY_LOADER:
                 $instance = new ArrayLoader($config);
+
                 break;
             case self::VALUE_LOADER:
                 $instance = new ValueLoader($config);
+
                 break;
             default:
                 throw new LoaderException('Driver not found : ' . $driver, LoaderException::LOADER_DRIVER_NOT_FOUND_ERROR);

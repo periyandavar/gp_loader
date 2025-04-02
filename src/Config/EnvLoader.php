@@ -49,7 +49,7 @@ class EnvLoader extends ConfigLoader
             if (trim($line) === '') {
                 continue;
             }
-            list($key, $value) = explode('=', $line, 2);
+            [$key, $value] = explode('=', $line, 2);
 
             // Create the array
             $data[$key] = $value;
