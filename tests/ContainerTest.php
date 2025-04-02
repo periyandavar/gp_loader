@@ -106,6 +106,7 @@ class ContainerTest extends TestCase
         $service = Container::get('testService');
         $this->assertInstanceOf(\stdClass::class, $service);
     }
+
     public function testGetNonExistentService()
     {
         $this->expectException(LoaderException::class);
