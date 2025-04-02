@@ -266,7 +266,6 @@ class ContainerTest extends TestCase
 
         // Use Reflection to mock the resolveDependency method
         $reflection = new ReflectionClass(Container::class);
-        $resolveDependencyMethod = $reflection->getMethod('resolveDependency');
 
         // Call the getConstrParams method
         $result = Container::getConstrParams(TestClass::class, ['param1' => 'value1', 'param2' => 'value2']);
@@ -345,6 +344,17 @@ class ContainerTest extends TestCase
         $this->assertFalse(Container::isClassRegistered('service2'));
     }
 
+    public function testLoadFromConfigWithStringClass()
+    {
+        $config = [
+            'service2' => TestClass::class,
+        ];
+
+        Container::loadFromConfig($config);
+
+        $this->assertTrue(Container::isClassRegistered('service2'));
+    }
+
     public function testLoadFromConfigWithClosureWithoutParams()
     {
         $config = [
@@ -392,7 +402,7 @@ class ContainerTest extends TestCase
         $param1 = reset($param1);
         $dep = new ConcreteDependency();
         $res = Container::resolveDependency($param1, [
-            'abstractDep' => $dep,
+            AbstractDependency::class => $dep,
         ]);
         $this->assertEquals($res, $dep);
     }
