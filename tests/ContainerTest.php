@@ -89,6 +89,23 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $service);
     }
 
+    public function testLoadFromConfigs()
+    {
+        // Define a configuration array
+        $config = [
+            'testService' => [
+                'class' => \stdClass::class,
+                'singleton' => true,
+            ],
+        ];
+
+        // Load the configuration
+        Container::loadFromConfig($config);
+
+        // Retrieve the service
+        $service = Container::get('testService');
+        $this->assertInstanceOf(\stdClass::class, $service);
+    }
     public function testGetNonExistentService()
     {
         $this->expectException(LoaderException::class);
@@ -263,9 +280,6 @@ class ContainerTest extends TestCase
         $reflectionClassMock->shouldReceive('getParameters')
             ->once()
             ->andReturn([$reflectionParameterMock1, $reflectionParameterMock2]);
-
-        // Use Reflection to mock the resolveDependency method
-        $reflection = new ReflectionClass(Container::class);
 
         // Call the getConstrParams method
         $result = Container::getConstrParams(TestClass::class, ['param1' => 'value1', 'param2' => 'value2']);
