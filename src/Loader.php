@@ -184,11 +184,15 @@ class Loader
             $helper_class = self::$prefixes['helper'] . $helper;
             if (class_exists($helper_class)) {
                 continue;
-            } elseif (file_exists($helper_file)) {
-                include_once $helper_file;
-            } else {
-                throw new LoaderException("Helper class '$helper' not found [$helper_class, $helper_file]", LoaderException::CLASS_OR_FILE_NOT_FOUND_ERROR);
             }
+
+            if (file_exists($helper_file)) {
+                include_once $helper_file;
+
+                continue;
+            }
+
+            throw new LoaderException("Helper class '$helper' not found [$helper_class, $helper_file]", LoaderException::CLASS_OR_FILE_NOT_FOUND_ERROR);
         }
     }
 

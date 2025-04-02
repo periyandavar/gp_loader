@@ -176,6 +176,11 @@ class Container
             if (is_string($config)) {
                 $config = ['class' => $config];
             }
+            if (is_callable($config)) {
+                self::set($name, $config);
+
+                continue;
+            }
             $class = $config['class'] ?? $config[0] ?? '';
             if (empty($class)) {
                 continue;

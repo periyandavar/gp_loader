@@ -8,6 +8,7 @@ use Loader\Exception\LoaderException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 use stdClass;
@@ -280,8 +281,128 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(TestDependency::class, $result[0]);
         $this->assertEquals('value2', $result[1]);
     }
+
+    public function testResolveDependencyWithDataValue()
+    {
+        // Mock a parameter name and data
+        $paramName = 'key1';
+        $data = ['key1' => 'value1'];
+
+        // Use Reflection to access the private/protected resolveDependency method
+        $reflection = new ReflectionMethod(Container::class, 'resolveDependency');
+        $reflection->setAccessible(true);
+
+        // Mock a ReflectionParameter
+        $paramMock = $this->createMock(ReflectionParameter::class);
+        $paramMock->method('getName')->willReturn($paramName);
+
+        // Call the resolveDependency method
+        $result = $reflection->invoke(null, $paramMock, $data);
+
+        // Assert that the resolved value matches the data value
+        $this->assertEquals('value1', $result);
+    }
+
+    public function testGetConstrParamsWithAbstractAndInterface()
+    {
+        // Register the concrete implementation in the container
+        Container::set('Test\Loader\AbstractDependency', new ConcreteDependency());
+        Container::set('Test\Loader\InterfaceDependency', new ConcreteDependency());
+
+        // Call the getConstrParams method
+        $result = Container::getConstrParams(TesterClass::class, []);
+
+        // Assert the resolved dependencies
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf('Test\Loader\ConcreteDependency', $result[0]);
+        $this->assertInstanceOf('Test\Loader\ConcreteDependency', $result[1]);
+    }
+
+    public function testLoadFromConfigWithString()
+    {
+        $config = [[
+            'service1' => 'SomeClass',
+        ]];
+
+        Container::loadFromConfig($config);
+
+        $this->assertFalse(Container::isClassRegistered('service1'));
+    }
+
+    public function testLoadFromConfigWithNumericKey()
+    {
+        $config = [
+            0 => ['class' => 'NumericClass'],
+        ];
+
+        Container::loadFromConfig($config);
+
+        $this->assertTrue(Container::isClassRegistered('NumericClass'));
+    }
+
+    public function testLoadFromConfigWithEmptyClass()
+    {
+        $config = [
+            'service2' => ['class' => ''],
+        ];
+
+        Container::loadFromConfig($config);
+
+        $this->assertFalse(Container::isClassRegistered('service2'));
+    }
+
+    public function testLoadFromConfigWithClosureWithoutParams()
+    {
+        $config = [
+            'closureService' => function() {
+                return new stdClass();
+            },
+        ];
+
+        Container::loadFromConfig($config);
+
+        $this->assertTrue(Container::isClassRegistered('closureService'));
+        $this->assertInstanceOf(stdClass::class, Container::get('closureService'));
+    }
+
+    public function testGetClassParamsWithStringStartsWithCondition()
+    {
+        // Define parameters with a string that starts with "\s"
+        $params = [
+            'param1' => '\sSomeString',
+            'param2' => 'RegularString',
+        ];
+
+        // Call the getClassParams method
+        $resolvedParams = Container::getClassParams($params);
+
+        // Assert that the parameter starting with "\s" is returned as-is
+        $this->assertArrayHasKey('param1', $resolvedParams);
+        $this->assertEquals('\sSomeString', $resolvedParams['param1']);
+
+        // Assert that the regular string is also returned as-is
+        $this->assertArrayHasKey('param2', $resolvedParams);
+        $this->assertEquals('RegularString', $resolvedParams['param2']);
+    }
 }
 
+namespace Test\Loader;
+
+abstract class AbstractDependency
+{
+}
+interface InterfaceDependency
+{
+}
+class ConcreteDependency extends AbstractDependency implements InterfaceDependency
+{
+}
+class TesterClass
+{
+    public function __construct(AbstractDependency $abstractDep, InterfaceDependency $interfaceDep)
+    {
+    }
+}
 class TestMethodClass
 {
     public function testMethod(string $param1, string $param2)
