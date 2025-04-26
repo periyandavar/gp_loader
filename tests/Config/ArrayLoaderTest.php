@@ -35,10 +35,25 @@ class ArrayLoaderTest extends TestCase
         $this->assertEquals('value2', $data['key2']);
     }
 
+    public function testGetFileWithInvalidType()
+    {
+        $this->expectException(LoaderException::class);
+        $this->expectExceptionCode(LoaderException::FILE_TYPE_NOT_SUPPORTED_ERROR);
+        $config = ['file' => $this->arrayFilePath];
+        $loader = ConfigLoader::getInstance(ConfigLoader::ENV_LOADER, $config);
+        $data = $loader->innerLoader();
+    }
+
+    public function testPhp()
+    {
+        $config = ConfigLoader::loadConfig($this->arrayFilePath);
+        $this->assertSame(['key1' => 'value1', 'key2' => 'value2'], $config->getAll());
+    }
+
     public function testInnerLoaderFileNotConfigured()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage('env file not configured');
+        $this->expectExceptionCode(LoaderException::FILE_NOT_FOUND_ERROR);
 
         $config = [];
         $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);
@@ -48,7 +63,7 @@ class ArrayLoaderTest extends TestCase
     public function testInnerLoaderFileNotFound()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage('env file not found');
+        $this->expectExceptionCode(LoaderException::FILE_NOT_FOUND_ERROR);
 
         $config = ['file' => 'non_existent_file.php'];
         $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);

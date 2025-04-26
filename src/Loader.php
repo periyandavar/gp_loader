@@ -151,15 +151,12 @@ class Loader
     {
         $ns = self::$prefixes['library'];
         foreach ($libraries as $library) {
-            $sys_lib_class = 'System\\Library\\' . $library;
-            $cust_lib_class = $ns . $library;
-            if (class_exists($sys_lib_class)) {
-                static::$ctrl->{lcfirst($library)} = new $sys_lib_class();
-            } elseif (class_exists($cust_lib_class)) {
-                static::$ctrl->{lcfirst($library)} = new $cust_lib_class();
+            $lib_class = $ns . $library;
+            if (class_exists($lib_class)) {
+                static::$ctrl->{lcfirst($library)} = new $lib_class();
             } else {
                 throw new LoaderException(
-                    "Library class '$library' not found [$sys_lib_class, $cust_lib_class]",
+                    "Library class '$library' not found [$lib_class]",
                     LoaderException::CLASS_NOT_FOUND_ERROR
                 );
             }
@@ -177,14 +174,7 @@ class Loader
     public function helper(...$helpers)
     {
         foreach ($helpers as $helper) {
-            if (class_exists($helper)) {
-                continue;
-            }
             $helper_file = trim(rtrim(self::$prefixes['helper'], '\\') . '/' . $helper) . '.php';
-            $helper_class = self::$prefixes['helper'] . $helper;
-            if (class_exists($helper_class)) {
-                continue;
-            }
 
             if (file_exists($helper_file)) {
                 include_once $helper_file;
@@ -192,7 +182,7 @@ class Loader
                 continue;
             }
 
-            throw new LoaderException("Helper class '$helper' not found [$helper_class, $helper_file]", LoaderException::CLASS_OR_FILE_NOT_FOUND_ERROR);
+            throw new LoaderException("Helper class '$helper' not found [$helper_file]", LoaderException::CLASS_OR_FILE_NOT_FOUND_ERROR);
         }
     }
 

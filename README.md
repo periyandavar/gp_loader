@@ -112,6 +112,8 @@ An abstract class that acts as the base for configuration loaders. It defines th
 - `defaultHandler($data)`: Default handler to load configuration values into environment variables.
 - `getInstance($driver, $config = [], $name = '')`: Factory method to create an instance of a specific loader.
 - `getConfig(string $name)`: Retrieves a named configuration instance.
+-  `resolveClassConstructor(string $class, array $params = [])`: Resolves the constructor dependencies of a class and creates an instance.
+- `resolveClassMethod($class, string $method, array $params = [])`: Resolves the dependencies for a specific method of a class and invokes it.
 
 #### Constants
 - `ENV_LOADER`: Represents the environment file loader.
