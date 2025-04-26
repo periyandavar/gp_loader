@@ -38,7 +38,7 @@ class ArrayLoaderTest extends TestCase
     public function testInnerLoaderFileNotConfigured()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage('env file not configured');
+        $this->expectExceptionMessage('array file not configured');
 
         $config = [];
         $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);
@@ -48,7 +48,7 @@ class ArrayLoaderTest extends TestCase
     public function testInnerLoaderFileNotFound()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage('env file not found');
+        $this->expectExceptionMessage('array file not found');
 
         $config = ['file' => 'non_existent_file.php'];
         $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);

@@ -234,8 +234,8 @@ class Container
                 continue;
             }
 
-            if (str_starts_with(strtoupper($value), '\s')) {
-                $params[$param] = $value;
+            if (str_starts_with(strtolower($value), '\s')) {
+                $params[$param] = str_replace('\s', '', $value);
 
                 continue;
             }
@@ -264,5 +264,23 @@ class Container
         }
 
         return $dependencies;
+    }
+
+    public static function resolveClassConstructor(string $class, array $params = [])
+    {
+        $params = self::getConstrParams($class, $params);
+
+        return new $class(...$params);
+    }
+
+    public static function resolveClassMethod($class, string $method, array $params = [])
+    {
+        if (is_string($class)) {
+            $class = self::resolveClassConstructor($class, $params);
+        }
+
+        $params = self::resolveMethod($class::class, $method, $params);
+
+        return call_user_func([$class, $method], ...$params);
     }
 }

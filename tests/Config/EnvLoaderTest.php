@@ -12,7 +12,7 @@ class EnvLoaderTest extends TestCase
     {
         // Create a temporary .env file for testing
         $this->envFilePath = __DIR__ . '/test.env';
-        file_put_contents($this->envFilePath, "KEY1=value1\nKEY2=value2\n");
+        file_put_contents($this->envFilePath, "\n \n#test\nKEY1=value1\nKEY2=value2\n");
     }
 
     protected function tearDown(): void

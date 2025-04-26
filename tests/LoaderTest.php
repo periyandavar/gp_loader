@@ -99,6 +99,20 @@ class LoaderTest extends TestCase
         $this->assertInstanceOf('Test\Service\TestService', $mockCtrl->test);
     }
 
+    public function testServiceFailure()
+    {
+        $mockCtrl = new class() {
+            public $test;
+        };
+        $this->expectException(LoaderException::class);
+        $this->expectExceptionCode(LoaderException::CLASS_NOT_FOUND_ERROR);
+
+        Loader::intialize();
+        Loader::setPrefixes(['service' => 'Test\\Servicess\\']);
+
+        Loader::autoLoadClass($mockCtrl, ['service' => ['Test']]);
+    }
+
     public function testLibrarySuccess()
     {
         $mockCtrl = new class() {

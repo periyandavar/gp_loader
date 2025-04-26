@@ -17,15 +17,16 @@ class ContainerTest extends TestCase
 {
     protected function setUp(): void
     {
+        $container = new Container();
         // Clear the container before each test
-        $reflection = new \ReflectionClass(Container::class);
+        $reflection = new \ReflectionClass($container);
         $instances = $reflection->getProperty('instances');
         $instances->setAccessible(true);
-        $instances->setValue([]);
+        $instances->setValue($container, []);
 
         $services = $reflection->getProperty('services');
         $services->setAccessible(true);
-        $services->setValue([]);
+        $services->setValue($container, []);
     }
 
     public function testSetAndGetInstance()
@@ -390,6 +391,7 @@ class ContainerTest extends TestCase
         $params = [
             'param1' => '\sSomeString',
             'param2' => 'RegularString',
+            'param3' => [1, 2, 3],
         ];
 
         // Call the getClassParams method
@@ -397,11 +399,12 @@ class ContainerTest extends TestCase
 
         // Assert that the parameter starting with "\s" is returned as-is
         $this->assertArrayHasKey('param1', $resolvedParams);
-        $this->assertEquals('\sSomeString', $resolvedParams['param1']);
+        $this->assertEquals('SomeString', $resolvedParams['param1']);
 
         // Assert that the regular string is also returned as-is
         $this->assertArrayHasKey('param2', $resolvedParams);
         $this->assertEquals('RegularString', $resolvedParams['param2']);
+        $this->assertEquals([1, 2, 3], $resolvedParams['param3']);
     }
 
     public function testInterfaceResolve()
@@ -420,6 +423,59 @@ class ContainerTest extends TestCase
             AbstractDependency::class => $dep,
         ]);
         $this->assertEquals($res, $dep);
+    }
+
+    public function testResolveClassConstructor()
+    {
+        // Define a test class with dependencies
+        $class = TestClass2::class;
+
+        // Mock dependencies (resolved manually here for simplicity)
+        $dependencies = [
+            'dependency1' => new Dependency1(),
+            'dependency2' => new Dependency2(),
+        ];
+
+        // Test resolving the class constructor
+        $resolvedObject = Container::resolveClassConstructor($class, $dependencies);
+
+        $this->assertInstanceOf($class, $resolvedObject, "Expected resolved object to be an instance of {$class}");
+        $this->assertInstanceOf(Dependency1::class, $resolvedObject->dependency1, 'Expected dependency1 to be resolved');
+        $this->assertInstanceOf(Dependency2::class, $resolvedObject->dependency2, 'Expected dependency2 to be resolved');
+    }
+
+    public function testResolveClassMethod()
+    {
+        // Define a test class and method
+        $class = TestClass2::class;
+        $method = 'testMethod';
+
+        // Mock dependencies (resolved manually here for simplicity)
+        $dependencies = [
+            'param1' => 'value1',
+            'param2' => 'value2',
+        ];
+
+        // Resolve the class constructor first
+        $resolvedObject = Container::resolveClassConstructor($class, []);
+
+        // Test resolving the class method
+        $result = Container::resolveClassMethod($resolvedObject, $method, $dependencies);
+
+        $this->assertEquals(
+            'Method called with value1 and value2',
+            $result,
+            'Expected the method to return the correct value'
+        );
+
+        // Test resolving the class method
+        $result = Container::resolveClassMethod($class, $method, $dependencies);
+
+        $this->assertEquals(
+            'Method called with value1 and value2',
+            $result,
+            'Expected the method to return the correct value'
+        );
     }
 }
 
@@ -455,5 +511,30 @@ class TestClass
 {
     public function __construct(TestDependency $dependency, $param2)
     {
+    }
+}
+
+class Dependency1
+{
+}
+
+class Dependency2
+{
+}
+
+class TestClass2
+{
+    public Dependency1 $dependency1;
+    public Dependency2 $dependency2;
+
+    public function __construct(Dependency1 $dependency1, Dependency2 $dependency2)
+    {
+        $this->dependency1 = $dependency1;
+        $this->dependency2 = $dependency2;
+    }
+
+    public function testMethod(string $param1, string $param2): string
+    {
+        return "Method called with {$param1} and {$param2}";
     }
 }

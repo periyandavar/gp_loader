@@ -35,10 +35,10 @@ class ArrayLoader extends ConfigLoader
     {
         $file = $this->config['file'] ?? '';
         if (empty($file)) {
-            throw new LoaderException('env file not configured', LoaderException::FILE_NOT_FOUND_ERROR);
+            throw new LoaderException('array file not configured', LoaderException::FILE_NOT_FOUND_ERROR);
         }
         if (! (file_exists($file))) {
-            throw new LoaderException('env file not found : ' . $file, LoaderException::FILE_NOT_FOUND_ERROR);
+            throw new LoaderException('array file not found : ' . $file, LoaderException::FILE_NOT_FOUND_ERROR);
         }
 
         return require $file;

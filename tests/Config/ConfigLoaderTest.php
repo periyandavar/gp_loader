@@ -3,6 +3,7 @@
 use Loader\Config\ArrayLoader;
 use Loader\Config\ConfigLoader;
 use Loader\Config\EnvLoader;
+use Loader\Exception\LoaderException;
 use PHPUnit\Framework\TestCase;
 
 class ConfigLoaderTest extends TestCase
@@ -21,10 +22,21 @@ class ConfigLoaderTest extends TestCase
         $this->assertInstanceOf(ArrayLoader::class, $loader);
     }
 
+    public function testGetInstanceInvalid()
+    {
+        $config = ['key' => 'value'];
+        $this->expectException(LoaderException::class);
+        $this->expectExceptionCode(LoaderException::LOADER_DRIVER_NOT_FOUND_ERROR);
+        $loader = ConfigLoader::getInstance('dd', $config);
+    }
+
     public function testGet()
     {
         $config = ['key' => 'value'];
-        $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);
+        $loader = ConfigLoader::getInstance(ConfigLoader::VALUE_LOADER, $config, 'config');
+        $loader = ConfigLoader::getConfig('config');
+        $loader->setLoadHandler(function() {});
+        $loader->load();
         $loader->override($config);
         $this->assertEquals('value', $loader->get('key'));
     }
@@ -35,6 +47,15 @@ class ConfigLoaderTest extends TestCase
         $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);
         $loader->set('key', 'new_value');
         $this->assertEquals('new_value', $loader->get('key'));
+    }
+
+    public function testSetException()
+    {
+        $config = ['key' => 'value'];
+        $loader = ConfigLoader::getInstance(ConfigLoader::ARRAY_LOADER, $config);
+        $this->expectException(LoaderException::class);
+        $this->expectExceptionCode(LoaderException::CONFIG_NOT_FOUND_ERROR);
+        $loader->set('key1', 'new_value', true);
     }
 
     public function testMerge()
