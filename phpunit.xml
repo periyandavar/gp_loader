@@ -13,7 +13,7 @@
         </report>
     </coverage>
     <testsuites>
-        <testsuite name="My Project Test Suite">
+        <testsuite name="Loader Tests">
             <directory>./tests</directory> <!-- Adjust this path to your tests directory -->
         </testsuite>
     </testsuites>

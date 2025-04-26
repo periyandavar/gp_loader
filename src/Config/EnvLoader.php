@@ -13,8 +13,6 @@
 
 namespace Loader\Config;
 
-use Loader\Exception\LoaderException;
-
 /**
  * EnvParser parse the env files and loads values from it
  *
@@ -33,13 +31,7 @@ class EnvLoader extends ConfigLoader
      */
     public function innerLoader(): array
     {
-        $file = $this->config['file'] ?? '';
-        if (empty($file)) {
-            throw new LoaderException('env file not configured', LoaderException::FILE_NOT_FOUND_ERROR);
-        }
-        if (! (file_exists($file))) {
-            throw new LoaderException('env file not found : ' . $file, LoaderException::FILE_NOT_FOUND_ERROR);
-        }
+        $file = $this->getFile();
         $data = [];
         $contents = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         foreach ($contents as $line) {
@@ -51,10 +43,19 @@ class EnvLoader extends ConfigLoader
             }
             [$key, $value] = explode('=', $line, 2);
 
-            // Create the array
             $data[$key] = $value;
         }
 
         return $data;
+    }
+
+    /**
+      * Return valid file types
+      *
+       * @return string[]
+      */
+    public function getValidFileTypes(): array
+    {
+        return ['env'];
     }
 }

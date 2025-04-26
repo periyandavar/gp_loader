@@ -2,18 +2,18 @@
 
 namespace Loader\Config;
 
-class ArrayLoader extends ConfigLoader
+use Symfony\Component\Yaml\Yaml;
+
+class YamlLoader extends ConfigLoader
 {
     /**
-     * Loads env file values from .env file and add to $_ENV
+     * Loads yaml file values from .yml or .yaml file.
      *
      * @return array
      */
     public function innerLoader(): array
     {
-        $file = $this->getFile();
-
-        return require $file;
+        return Yaml::parseFile($this->getFile());
     }
 
     /**
@@ -23,6 +23,6 @@ class ArrayLoader extends ConfigLoader
      */
     public function getValidFileTypes(): array
     {
-        return ['php'];
+        return ['yaml', 'yml'];
     }
 }

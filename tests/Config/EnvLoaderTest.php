@@ -35,10 +35,16 @@ class EnvLoaderTest extends TestCase
         $this->assertEquals('value2', $data['KEY2']);
     }
 
+    public function testPhp()
+    {
+        $config = ConfigLoader::loadConfig($this->envFilePath);
+        $this->assertSame(['KEY1' => 'value1', 'KEY2' => 'value2'], $config->getAll());
+    }
+
     public function testInnerLoaderFileNotConfigured()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage('env file not configured');
+        $this->expectExceptionCode(LoaderException::FILE_NOT_FOUND_ERROR);
 
         $config = [];
         $loader = ConfigLoader::getInstance(ConfigLoader::ENV_LOADER, $config);
@@ -48,7 +54,7 @@ class EnvLoaderTest extends TestCase
     public function testInnerLoaderFileNotFound()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage('env file not found');
+        $this->expectExceptionCode(LoaderException::FILE_NOT_FOUND_ERROR);
 
         $config = ['file' => 'non_existent_file.env'];
         $loader = ConfigLoader::getInstance(ConfigLoader::ENV_LOADER, $config);

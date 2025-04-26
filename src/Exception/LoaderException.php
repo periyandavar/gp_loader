@@ -12,6 +12,8 @@ class LoaderException extends Exception
     public const CLASS_NOT_FOUND_ERROR = 103;
     public const CLASS_OR_FILE_NOT_FOUND_ERROR = 104;
     public const CONFIG_NOT_FOUND_ERROR = 105;
+    public const FILE_TYPE_NOT_SUPPORTED_ERROR = 106;
+    public const FILE_READ_ERROR = 107;
 
     public function __construct($message = '', $code = 0, Exception $previous = null)
     {

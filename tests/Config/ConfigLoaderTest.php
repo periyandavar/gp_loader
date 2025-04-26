@@ -85,4 +85,31 @@ class ConfigLoaderTest extends TestCase
         $this->assertArrayHasKey('key2', $data);
         $this->assertEquals('value2', $data['key2']);
     }
+
+    public function testLoadJson()
+    {
+        $config = ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.json');
+        $this->assertEquals($config->getAll(), ['name' => 'test', 'value' => 1]);
+    }
+
+    public function testLoadYaml()
+    {
+        $config = ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.yaml');
+        $this->assertEquals($config->getAll(), ['name' => 'test', 'value' => 1]);
+        $config = ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.yml');
+        $this->assertEquals($config->getAll(), ['name' => 'test', 'value' => 1]);
+    }
+
+    public function testXml()
+    {
+        $config = ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.xml', 'config');
+        $this->assertEquals($config->getAll(), ['name' => 'test', 'value' => 1]);
+    }
+
+    public function testLoadConfigWithInvalidFileType()
+    {
+        $this->expectException(LoaderException::class);
+        $this->expectExceptionCode(LoaderException::FILE_TYPE_NOT_SUPPORTED_ERROR);
+        ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.txt');
+    }
 }

@@ -25,6 +25,7 @@
     },
     "require": {
         "php" : "^8.0",
-        "mockery/mockery": "^1.6"
+        "mockery/mockery": "^1.6",
+        "symfony/yaml": "^6.4"
     }
 }

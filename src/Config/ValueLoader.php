@@ -11,6 +11,16 @@ class ValueLoader extends ConfigLoader
      */
     public function innerLoader(): array
     {
-        return $this->config;
+        return $this->settings;
+    }
+
+    /**
+     * Return valid file types
+     *
+     * @return string[]
+     */
+    public function getValidFileTypes(): array
+    {
+        return [];
     }
 }

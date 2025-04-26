@@ -12,4 +12,9 @@ class ValueLoaderTest extends TestCase
 
         $this->assertEquals($config, $loader->getAll());
     }
+
+    public function testValidFileTypes()
+    {
+        $this->assertEmpty(ConfigLoader::getInstance(ConfigLoader::VALUE_LOADER)->getValidFileTypes());
+    }
 }
