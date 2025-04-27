@@ -88,7 +88,6 @@ class Loader
             static::$instance->$load(...$files);
         }
 
-        // exit;
         return static::$instance;
     }
 
