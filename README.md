@@ -29,7 +29,7 @@ The GP Loader package provides a configuration and dependency loading framework 
 
 ## Requirements
 
-- PHP 7.3.5 or higher
+- PHP 8.1 or higher
 - composer
 
 ---
@@ -55,8 +55,13 @@ require 'vendor/autoload.php';
 ## Features
 
 - **Flexible Configuration Loading**:
-  - Supports loading configurations from multiple sources, including `.env` files, PHP arrays, and direct values.
+  - Supports loading configurations from multiple sources, including `.env` files, PHP arrays, Json, Xml, Yaml and direct values.
   - Easy merging, overriding, and retrieval of configuration data.
+
+- **Easily load the Configuration from any files**
+  - Load the config from any files .env, .json, .yaml, .php
+  - Access it anywhere in your application
+  - Eassy to load and manage
 
 - **Dependency Injection Container**:
   - Manage services and instances with a built-in DI container.
@@ -112,43 +117,19 @@ An abstract class that acts as the base for configuration loaders. It defines th
 - `defaultHandler($data)`: Default handler to load configuration values into environment variables.
 - `getInstance($driver, $config = [], $name = '')`: Factory method to create an instance of a specific loader.
 - `getConfig(string $name)`: Retrieves a named configuration instance.
--  `resolveClassConstructor(string $class, array $params = [])`: Resolves the constructor dependencies of a class and creates an instance.
-- `resolveClassMethod($class, string $method, array $params = [])`: Resolves the dependencies for a specific method of a class and invokes it.
+- `loadConfig(string $file, string $name = '')`: Load the configs directly from the file.
+- `getFile()`: Returns the file.
+
 
 #### Constants
 - `ENV_LOADER`: Represents the environment file loader.
-- `ARRAY_LOADER`: Represents the array-based loader.
+- `ARRAY_LOADER`: Represents the array-based php file loader.
+- `XML_LOADER` : Represents the XML file loader.
+- `YAML_LOADER`: Represents the YAML file loader.
+- `JSON_LOADER` : Represents the JSON file loader.
 - `VALUE_LOADER`: Represents the value-based loader.
 
 ---
-
-### ArrayLoader
-
-A concrete implementation of `ConfigLoader` that loads configuration data from a PHP array file.
-
-#### Methods
-- `innerLoader()`: Reads configuration data from a specified array file.
-
----
-
-### EnvLoader
-
-A concrete implementation of `ConfigLoader` that loads configuration data from a `.env` file.
-
-#### Methods
-- `innerLoader()`: Reads and parses a `.env` file, extracting key-value pairs.
-
----
-
-### ValueLoader
-
-A concrete implementation of `ConfigLoader` that directly uses the provided configuration data.
-
-#### Methods
-- `innerLoader()`: Returns the configuration data provided during initialization.
-
----
-
 ### Container
 
 A dependency injection container for managing instances and services.
@@ -163,6 +144,8 @@ A dependency injection container for managing instances and services.
 - `getConstrParams(string $_class_name, $data)`: Resolves constructor dependencies for a class.
 - `loadFromConfig(array $_config)`: Loads configuration and registers services.
 - `resolveMethod(string $class, string $method, array $data)`: Resolves dependencies for a specific method.
+-  `resolveClassConstructor(string $class, array $params = [])`: Resolves the constructor dependencies of a class and creates an instance.
+- `resolveClassMethod($class, string $method, array $params = [])`: Resolves the dependencies for a specific method of a class and invokes it.
 
 ---
 
@@ -177,6 +160,27 @@ A class responsible for managing the loading of application components.
 ---
 
 ## Usage
+
+### Load the config from file.
+
+Load the configuration directly from the file.
+
+```
+use Loader\Config\ConfigLoader;
+
+$config = ConfigLoader::loadConfig(__DIR__ . 'test.xml', 'xml_config);
+
+$config_values = $config->getAll();
+print_r($config_values);
+
+
+// to load the created config by name.
+$config = ConfigLoader::getConfig('xml_config');
+
+$config_values = $config->getAll();
+print_r($config_values);
+
+```
 
 ### Loading Configuration
 
