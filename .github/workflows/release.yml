@@ -10,7 +10,6 @@ on:
 
 jobs:
   release:
-    needs: changelog
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
 
@@ -47,3 +46,52 @@ jobs:
             ${{ steps.changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  changelog:
+    needs: release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, intl, zip
+
+      - name: Suppress deprecation warnings
+        run: |
+          echo "error_reporting(E_ALL & ~E_DEPRECATED);" > suppress_deprecations.php
+          php -f suppress_deprecations.php
+
+      - name: Install dependencies
+        run: |
+          composer install
+
+      - name: Run tests
+        run: |
+          composer test
+
+      - name: Generate Changelog
+        id: changelog
+        uses: scottbrenner/generate-changelog-action@master
+        with:
+          repo: ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Changelog
+        id: changelog_updater
+        uses: stefanzweifel/changelog-updater-action@v1
+        with:
+          latest-version: ${{ github.event.release.tag_name }}
+          release-notes: ${{ github.event.release.body }}
+
+      - name: Commit updated CHANGELOG
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: main
+          commit_message: 'Update CHANGELOG.md'
+          file_pattern: CHANGELOG.md
