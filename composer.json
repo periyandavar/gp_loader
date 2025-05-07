@@ -3,6 +3,10 @@
     "description": "A Loader library to autoload the classes and a container to support the dependency injections",
     "type": "library",
     "license": "MIT",
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
     "authors": [{
         "name": "periyandavar-ganesh",
         "email": "vickyperiyandavar@gmail.com"
