@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history and tags
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -25,7 +27,7 @@ jobs:
 
       - name: Suppress deprecation warnings
         run: |
-          echo "error_reporting(E_ALL & ~E_DEPRECATED);" > suppress_deprecations.php
+          echo "error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);" > suppress_deprecations.php
           php -f suppress_deprecations.php
 
       - name: Install dependencies
