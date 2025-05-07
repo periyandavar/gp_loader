@@ -9,7 +9,54 @@ on:
   workflow_dispatch:
 
 jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, intl, zip
+
+      - name: Suppress deprecation warnings
+        run: |
+          echo "error_reporting(E_ALL & ~E_DEPRECATED);" > suppress_deprecations.php
+          php -f suppress_deprecations.php
+
+      - name: Install dependencies
+        run: |
+          composer install
+
+      - name: Run tests
+        run: |
+          composer test
+
+      - name: Generate changelog
+        id: changelog
+        uses: janheinrichmerker/action-github-changelog-generator@v2.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Changelog
+        id: changelog_updater
+        uses: stefanzweifel/changelog-updater-action@v1
+        with:
+          latest-version: ${{ needs.release.outputs.tag_name }}
+          release-notes: ${{ github.event.release.body }}
+
+      - name: Commit updated CHANGELOG
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: main
+          commit_message: 'Update CHANGELOG.md'
+          file_pattern: CHANGELOG.md
   release:
+    needs: changelog
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
 
@@ -41,54 +88,10 @@ jobs:
           git push origin $VERSION
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  changelog:
-    needs: release
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          extensions: mbstring, intl, zip
-
-      - name: Suppress deprecation warnings
+      - name: Trigger Release Workflow
         run: |
-          echo "error_reporting(E_ALL & ~E_DEPRECATED);" > suppress_deprecations.php
-          php -f suppress_deprecations.php
-
-      - name: Install dependencies
-        run: |
-          composer install
-
-      - name: Run tests
-        run: |
-          composer test
-
-      - name: Generate Changelog
-        id: changelog
-        uses: scottbrenner/generate-changelog-action@master
-        with:
-          from-tag: ${{ needs.release.outputs.tag_name }}
-          to-tag: ${{ github.ref }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update Changelog
-        id: changelog_updater
-        uses: stefanzweifel/changelog-updater-action@v1
-        with:
-          latest-version: ${{ needs.release.outputs.tag_name }}
-          release-notes: ${{ github.event.release.body }}
-
-      - name: Commit updated CHANGELOG
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          branch: main
-          commit_message: 'Update CHANGELOG.md'
-          file_pattern: CHANGELOG.md
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/release.yml/dispatches \
+            -d '{"ref": "refs/tags/${{ steps.tag.outputs.tag }}"}'
