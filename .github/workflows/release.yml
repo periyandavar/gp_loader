@@ -23,6 +23,11 @@ jobs:
           php-version: '8.1'
           extensions: mbstring, intl, zip
 
+      - name: Suppress deprecation warnings
+        run: |
+          echo "error_reporting(E_ALL & ~E_DEPRECATED);" > suppress_deprecations.php
+          php -f suppress_deprecations.php
+
       - name: Install dependencies
         run: |
           composer install
