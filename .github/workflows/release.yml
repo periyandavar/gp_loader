@@ -33,7 +33,7 @@ jobs:
         id: tag
         run: |
           VERSION=$(git describe --tags --abbrev=0)
-          VERSION=$(./node_modules/.bin/semver $VERSION -i patch)
+          VERSION=$(npx semver $VERSION -i patch)
           git tag $VERSION
           git push origin $VERSION
         env:
