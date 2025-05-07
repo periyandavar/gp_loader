@@ -39,6 +39,14 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Build Artifact
+        run: |
+          mkdir -p build
+          zip -r ./build/artifact.zip ./src
+
+      - name: List Build Directory
+        run: ls -la ./build
+
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
