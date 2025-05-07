@@ -45,10 +45,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Changelog
+        id: changelog_updater
         uses: stefanzweifel/changelog-updater-action@v1
         with:
-          latest-version: ${{ steps.changelog.outputs.version }}
-          release-notes: ${{ steps.changelog.outputs.changelog }}
+          latest-version: ${{ github.event.release.tag_name }}
+          release-notes: ${{ github.event.release.body }}
 
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5
