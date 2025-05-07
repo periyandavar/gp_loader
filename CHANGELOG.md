@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/periyandavar/gp_loader/tree/HEAD)
 
-[Full Changelog](https://github.com/periyandavar/gp_loader/compare/2.0.5...HEAD)
+[Full Changelog](https://github.com/periyandavar/gp_loader/compare/2.0.6...HEAD)
+
+**Merged pull requests:**
+
+- fix: fix composer test in release [\#38](https://github.com/periyandavar/gp_loader/pull/38) ([periyandavar](https://github.com/periyandavar))
+- fix: release action [\#37](https://github.com/periyandavar/gp_loader/pull/37) ([periyandavar](https://github.com/periyandavar))
+
+## [2.0.6](https://github.com/periyandavar/gp_loader/tree/2.0.6) (2025-05-07)
+
+[Full Changelog](https://github.com/periyandavar/gp_loader/compare/2.0.5...2.0.6)
 
 **Merged pull requests:**
 
