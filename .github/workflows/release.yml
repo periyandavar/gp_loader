@@ -1,0 +1,62 @@
+name: Build and Release Loader Library
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+  workflow_dispatch:  # Allow manual triggering of the workflow
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, zip
+
+      - name: Install dependencies
+        run: |
+          composer install --no-dev
+
+      - name: Run tests
+        run: |
+          composer test
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, intl, zip
+
+      - name: Install dependencies
+        run: |
+          composer install --no-dev
+
+      - name: Create Git tag
+        run: |
+          git tag -a v$(date +%Y%m%d%H%M%S) -m "Release $(date +%Y%m%d%H%M%S)"
+          git push origin --tags
+
+      - name: Publish to Packagist
+        uses: hotaruma/packagist-sync@v1.0.1
+        with:
+          packagist-username: ${{ secrets.PACKAGIST_USERNAME }}
+          api-token: ${{ secrets.PACKAGIST_TOKEN }}
