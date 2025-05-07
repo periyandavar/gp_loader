@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/periyandavar/gp_loader/tree/HEAD)
 
-[Full Changelog](https://github.com/periyandavar/gp_loader/compare/2.0.4...HEAD)
+[Full Changelog](https://github.com/periyandavar/gp_loader/compare/2.0.5...HEAD)
+
+**Merged pull requests:**
+
+- fix: release action [\#36](https://github.com/periyandavar/gp_loader/pull/36) ([periyandavar](https://github.com/periyandavar))
+
+## [2.0.5](https://github.com/periyandavar/gp_loader/tree/2.0.5) (2025-05-07)
+
+[Full Changelog](https://github.com/periyandavar/gp_loader/compare/2.0.4...2.0.5)
 
 **Merged pull requests:**
 
