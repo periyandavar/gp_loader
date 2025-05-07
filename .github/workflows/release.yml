@@ -1,4 +1,4 @@
-name: Build and Release Loader Library
+name: Build and Release Loader
 
 on:
   pull_request:
@@ -6,33 +6,10 @@ on:
       - main
     types:
       - closed
-  workflow_dispatch:  # Allow manual triggering of the workflow
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          extensions: mbstring, intl, zip
-
-      - name: Install dependencies
-        run: |
-          composer install --no-dev
-
-      - name: Run tests
-        run: |
-          composer test
-
-  release:
-    needs: build
+  changelog:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
 
@@ -50,13 +27,66 @@ jobs:
         run: |
           composer install --no-dev
 
-      - name: Create Git tag
+      - name: Run tests
         run: |
-          git tag -a v$(date +%Y%m%d%H%M%S) -m "Release $(date +%Y%m%d%H%M%S)"
-          git push origin --tags
+          composer test
 
-      - name: Publish to Packagist
-        uses: hotaruma/packagist-sync@v1.0.1
+      - name: Generate Changelog
+        id: changelog
+        uses: scottbrenner/generate-changelog-action@master
         with:
-          packagist-username: ${{ secrets.PACKAGIST_USERNAME }}
-          api-token: ${{ secrets.PACKAGIST_TOKEN }}
+          repo: ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Changelog
+        uses: stefanzweifel/changelog-updater-action@v1
+        with:
+          latest-version: ${{ steps.changelog.outputs.version }}
+          release-notes: ${{ steps.changelog.outputs.changelog }}
+
+      - name: Commit updated CHANGELOG
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: main
+          commit_message: 'Update CHANGELOG.md'
+          file_pattern: CHANGELOG.md
+
+  release:
+    needs: changelog
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, intl, zip
+
+      - name: Install dependencies
+        run: |
+          composer install --no-dev
+
+      - name: Create Git Tag
+        id: tag
+        run: |
+          VERSION=$(git describe --tags --abbrev=0)
+          VERSION=$(./node_modules/.bin/semver $VERSION -i patch)
+          git tag $VERSION
+          git push origin $VERSION
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          body: |
+            ${{ steps.changelog.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
