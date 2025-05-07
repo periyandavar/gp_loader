@@ -25,7 +25,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer install --no-dev
+          composer install
+
+      - name: Run tests
+        run: |
+          composer test
 
       - name: Generate Changelog
         id: changelog
