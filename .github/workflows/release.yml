@@ -74,7 +74,8 @@ jobs:
         id: changelog
         uses: scottbrenner/generate-changelog-action@master
         with:
-          repo: ${{ github.repository }}
+          from-tag: ${{ needs.release.outputs.tag_name }}
+          to-tag: ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
