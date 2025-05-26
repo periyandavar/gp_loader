@@ -54,7 +54,7 @@ abstract class ConfigLoader
      * Get the value of a key
      *
      * @param string $key
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -198,7 +198,7 @@ abstract class ConfigLoader
             self::FILE_NAME => $file,
         ];
 
-        if ($mode == 'r' && self::$instances[$name] ?? false) {
+        if ($mode == 'r' && (self::$instances[$name] ?? false)) {
             return self::$instances[$name];
         }
 
