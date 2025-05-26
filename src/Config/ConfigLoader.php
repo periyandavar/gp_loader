@@ -54,12 +54,13 @@ abstract class ConfigLoader
      * Get the value of a key
      *
      * @param string $key
+     * @param mixed $default
      *
      * @return mixed
      */
-    public function get(string $key)
+    public function get(string $key, $default = null)
     {
-        return $this->data[$key] ?? null;
+        return $this->data[$key] ?? $default;
     }
 
     /**
@@ -190,12 +191,17 @@ abstract class ConfigLoader
      *
      * @return ConfigLoader
      */
-    public static function loadConfig(string $file, string $name = '')
+    public static function loadConfig(string $file, string $name = '', $mode = 'w')
     {
         $file_type = pathinfo($file, PATHINFO_EXTENSION);
         $settings = [
             self::FILE_NAME => $file,
         ];
+
+        if ($mode == 'r' && self::$instances[$name] ?? false) {
+            return self::$instances[$name];
+        }
+
         switch ($file_type) {
             case 'env':
                 $instance = new EnvLoader($settings);
@@ -221,6 +227,14 @@ abstract class ConfigLoader
             default:
                 throw new LoaderException('File type not supported : ' . $file_type, LoaderException::FILE_TYPE_NOT_SUPPORTED_ERROR);
         }
+
+        if (isset(self::$instances[$name]) && $mode == 'a') {
+            $config = self::$instances[$name];
+            $config->merge($instance->getAll());
+
+            return $config;
+        }
+
         if (! empty($name)) {
             self::$instances[$name] = $instance;
         }
@@ -236,8 +250,6 @@ abstract class ConfigLoader
         if ($this->loadHandler) {
             return call_user_func($this->loadHandler, $this->data);
         }
-
-        $this->defaultHandler($this->data);
     }
 
     /**
@@ -259,9 +271,9 @@ abstract class ConfigLoader
      *
      * @return void
      */
-    protected function defaultHandler($data)
+    public function putToEnv()
     {
-        foreach ($data as $key => $value) {
+        foreach ($this->getAll() as $key => $value) {
             putenv("$key=$value");
         }
     }
