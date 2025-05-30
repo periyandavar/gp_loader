@@ -1,32 +1,21 @@
 <?php
 
-/**
- * Loader
- * php version 7.3.5
- *
- * @category Loader
- * @package  Core
- * @author   Periyandavar <periyandavar@gmail.com>
- * @license  http://license.com license
- * @link     http://url.com
- */
-
 namespace Loader;
 
-use Loader\Config\ConfigLoader;
 use Loader\Exception\LoaderException;
 
-/**
- * Loader Class autoloads the files
- *
- * @category Loader
- * @package  Core
- * @author   Periyandavar <periyandavar@gmail.com>
- * @license  http://license.com license
- * @link     http://url.com
- */
 class Loader
 {
+    public const MODEL = 'model';
+    public const SERVICE = 'service';
+    public const HELPER = 'helper';
+    public const LIBRARY = 'library';
+
+    public const MODEL_ACTION = 'models';
+    public const SERVICE_ACTIOIN = 'services';
+    public const HELPER_ACTION = 'helpers';
+    public const LIBRARY_ACTION = 'libraries';
+
     /**
      * Loader class instance
      *
@@ -38,150 +27,297 @@ class Loader
     /**
      * Controller object
      *
-     * @var object
+     * @var object|null
      */
-    protected static $ctrl;
+    protected static $ctrl = null;
 
     /**
      * Instantiate the the Loader instance
      */
-    private function __construct(?ConfigLoader $_config = null)
+    private function __construct()
     {
-        $default_config = [
-            'model' => "App\Model\\",
-            'service' => "App\Service\\",
-            'helper' => "App\Helper\\",
-            'library' => "System\Library\\",
-        ];
-        $config = $_config ? $_config->getAll() : $default_config;
-        $config = array_merge($default_config, $config);
-
-        foreach ($config as $key => $value) {
-            self::$prefixes[$key] = $value;
-        }
     }
 
+    /**
+     * Set the prefixes for the loader
+     *
+     * @param array $prefixes Prefixes for model, service, helper and library
+     */
     public static function setPrefixes(array $prefixes)
     {
         self::$prefixes = $prefixes;
     }
 
     /**
+     * Returns the loader map
+     *
+     * @return string[]
+     */
+    public static function loaderMap()
+    {
+        return [
+            self::MODEL => self::MODEL_ACTION,
+            self::SERVICE => self::SERVICE_ACTIOIN,
+            self::HELPER => self::HELPER_ACTION,
+            self::LIBRARY => self::LIBRARY_ACTION,
+        ];
+    }
+
+    /**
+     * Checks if the loader is valid
+     *
+     * @param string $loader Loader name
+     *
+     * @return bool
+     */
+    public static function isValidLoader(string $loader): bool
+    {
+        return in_array($loader, array_keys(self::loaderMap()));
+    }
+
+    /**
+     * Returns the action name for the loader
+     *
+     * @param string $loader Loader name
+     *
+     * @return string|null
+     */
+    public static function getLoaderAction(string $loader): ?string
+    {
+        return self::loaderMap()[$loader] ?? null;
+    }
+
+    /**
      * Loads the all classes from autoload class list
      * and creates the instance for them
      *
-     * @param object $ctrl Controller object
+     * @param object $ctrl      Controller object
+     * @param array  $autoloads
      *
      * @return Loader
      */
-    public static function autoLoadClass($ctrl, $autoloads, ?ConfigLoader $config = null): Loader
+    public static function autoLoadClass($ctrl, array $autoloads): Loader
     {
-        $loads = array_keys(self::$prefixes);
-        static::$instance ?? static::intialize($config);
+        if (static::$instance == null) {
+            static::$instance = new self();
+        }
         static::$ctrl = $ctrl;
-        foreach ($loads as $load) {
-            $files = $autoloads[$load] ?? [];
-            if (! is_array($files)) {
-                $files = [$files];
+        foreach ($autoloads as $key => $load) {
+            if (! self::isValidLoader($key)) {
+                continue;
             }
-
-            static::$instance->$load(...$files);
+            $load = is_array($load) ? $load : [$load];
+            $action = self::getLoaderAction($key);
+            static::$instance->$action($load);
         }
 
         return static::$instance;
     }
 
     /**
-     * Loads models
+     * Load model
      *
-     * @param string ...$models Model list
+     * @param string $model
+     * @param string $key
      *
      * @return void
      */
-    public function model(...$models)
+    public function model(string $model, string $key)
     {
-        $ns = self::$prefixes['model'];
-        foreach ($models as $model) {
-            $class = $ns . $model . 'Model';
-            if (class_exists($class)) {
-                static::$ctrl->{lcfirst($model)} = new $class();
-            } else {
-                throw new LoaderException(
-                    "Unable to locate the model class '$model'",
-                    LoaderException::CLASS_NOT_FOUND_ERROR
-                );
-            }
+        $this->setClass($model, $key, self::MODEL);
+    }
+
+    /**
+     * Loads models
+     *
+     * @param array $models Model list
+     *
+     * @return void
+     */
+    public function models(array $models)
+    {
+        foreach ($models as $key => $model) {
+            $this->model($model, $key);
         }
     }
 
     /**
-     * Loads Services
+     * Sets the class for the loader
      *
-     * @param string ...$services Service list
+     * @param string $class Class name
+     * @param string $key   Key for the class
+     * @param string $type  Type of the class (service, model, library, helper)
      *
      * @return void
      * @throws LoaderException
      */
-    public function service(...$services)
+    public function setClass(string $class, string $key, string $type = self::SERVICE)
     {
-        $ns = self::$prefixes['service'];
-        foreach ($services as $service) {
-            $class = $ns . $service . 'Service';
-            if (class_exists($class)) {
-                static::$ctrl->{lcfirst($service)} = new $class();
-            } else {
-                throw new LoaderException(
-                    "Unable to loacate the '$service' class [$class]",
-                    LoaderException::CLASS_NOT_FOUND_ERROR
-                );
-            }
+        if (is_null(static::$ctrl)) {
+            throw new LoaderException(
+                'Mapper object is not set for the loader',
+                LoaderException::MAPPER_NOT_FORUND_ERROR
+            );
+        }
+        $load = static::$ctrl->load ?? new Load();
+        if (! $load instanceof Load) {
+            throw new LoaderException(
+                'Load object is not set for the loader',
+                LoaderException::INVALID_LOAD_CLASS_ERROR
+            );
+        }
+        $ns = self::$prefixes[$type] ?? '';
+        $key = $this->generateKey($key, $class);
+        $class = $this->getClass($class, $ns);
+        $load->$type->$key = $class;
+        static::$ctrl->load = $load;
+    }
+
+    /**
+     * Generates a key for the class
+     *
+     * @param string $key   Key for the class
+     * @param string $class Class name
+     *
+     * @return string
+     */
+    public function generateKey(string $key, string $class): string
+    {
+        if (! (empty($key)) && ! (is_numeric($key))) {
+            return $key;
+        }
+
+        return strtolower(basename(str_replace('\\', '/', $class)));
+    }
+
+    /**
+     * Returns the class object for the given class name
+     *
+     * @param string $class     Class name
+     * @param string $namespace Namespace for the class
+     *
+     * @return object
+     * @throws LoaderException
+     */
+    public function getClass(string $class, string $namespace)
+    {
+        $obj = null;
+
+        try {
+            $obj = self::loadClass($class);
+        } catch (LoaderException) {
+            $class = $namespace . '\\' . $class;
+            $obj = self::loadClass($class);
+        }
+
+        return $obj;
+    }
+
+    /**
+     * Loads the class and returns the instance of the class
+     *
+     * @param  string                            $class
+     * @throws \Loader\Exception\LoaderException
+     *
+     * @return object
+     */
+    public static function loadClass(string $class)
+    {
+        if (! class_exists($class)) {
+            throw new LoaderException(
+                "Unable to locate the model class '$class'",
+                LoaderException::CLASS_NOT_FOUND_ERROR
+            );
+        }
+
+        return Container::resolveClassConstructor($class);
+    }
+
+    /**
+     * Loads Service
+     *
+     * @param string $service Service
+     * @param string $key
+     *
+     * @return void
+     * @throws LoaderException
+     */
+    public function service(string $service, string $key)
+    {
+        $this->setClass($service, $key, self::SERVICE);
+    }
+
+    /**
+     * Load the services.
+     *
+     * @param  array $services
+     * @return void
+     */
+    public function services(array $services)
+    {
+        foreach ($services as $key => $service) {
+            $this->service($service, $key);
         }
     }
 
     /**
      * Loads Libraries
      *
-     * @param string ...$libraries Library list
+     * @param array $libraries Library list
      *
      * @return void
      * @throws LoaderException
      */
-    public function library(...$libraries)
+    public function libraries(array $libraries)
     {
-        $ns = self::$prefixes['library'];
-        foreach ($libraries as $library) {
-            $lib_class = $ns . $library;
-            if (class_exists($lib_class)) {
-                static::$ctrl->{lcfirst($library)} = new $lib_class();
-            } else {
-                throw new LoaderException(
-                    "Library class '$library' not found [$lib_class]",
-                    LoaderException::CLASS_NOT_FOUND_ERROR
-                );
-            }
+        foreach ($libraries as $key => $library) {
+            $this->library($library, $key);
         }
+    }
+
+    /**
+     * Loads a library
+     *
+     * @param string $library Library name
+     * @param string $key     Key for the library
+     *
+     * @return void
+     * @throws LoaderException
+     */
+    public function library(string $library, string $key)
+    {
+        $this->setClass($library, $key, self::LIBRARY);
     }
 
     /**
      * Loads helpers
      *
-     * @param string ...$helpers Helper list
+     * @param array $helpers Helper list
      *
      * @return void
      * @throws LoaderException
      */
-    public function helper(...$helpers)
+    public function helpers(array $helpers)
     {
         foreach ($helpers as $helper) {
-            $helper_file = trim(rtrim(self::$prefixes['helper'], '\\') . '/' . $helper) . '.php';
+            $this->helper($helper);
+        }
+    }
 
-            if (file_exists($helper_file)) {
-                include_once $helper_file;
+    /**
+     * Loads a helper
+     *
+     * @param string $helper Helper name
+     *
+     * @return void
+     * @throws LoaderException
+     */
+    public function helper(string $helper)
+    {
+        $helper_file = trim(rtrim(self::$prefixes['helper'] ?? '', '\\') . '/' . $helper) . '.php';
 
-                continue;
-            }
-
-            throw new LoaderException("Helper class '$helper' not found [$helper_file]", LoaderException::CLASS_OR_FILE_NOT_FOUND_ERROR);
+        if (! $this->loadFile($helper_file)) {
+            throw new LoaderException('Loader file not exists', LoaderException::FILE_NOT_FOUND_ERROR);
         }
     }
 
@@ -222,12 +358,12 @@ class Loader
     /**
      * Intialize the Loader class and returns load class object
      *
-     * @return Loader
+     * @return self
      */
-    public static function intialize(?ConfigLoader $config = null): Loader
+    public static function intialize(): Loader
     {
         if (self::$instance == null) {
-            self::$instance = new self($config);
+            self::$instance = new self();
         }
 
         return self::$instance;

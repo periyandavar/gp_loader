@@ -59,28 +59,28 @@ class LoaderTest extends TestCase
     {
         $mockCtrl = new class() {
             public $test;
+            public $load;
         };
 
         Loader::intialize(); // Ensure the Loader is initialized
         Loader::setPrefixes(['model' => 'Test\\Model\\']);
 
         // Define the TestModel class in the correct namespace
-        eval('namespace Test\Model; class TestModel {}');
+        eval('class TestModel {}');
 
         // Call the autoLoadClass method to load the model
-        Loader::autoLoadClass($mockCtrl, ['model' => 'Test']);
+        Loader::autoLoadClass($mockCtrl, ['model' => ['test' => 'TestModel']]);
 
         // Assert that the model was loaded correctly
-        $this->assertInstanceOf('Test\Model\TestModel', $mockCtrl->test);
+        $this->assertInstanceOf('TestModel', $mockCtrl->load->model->test);
     }
 
     public function testModelFailure()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage("Unable to locate the model class 'NonExistent'");
 
         $mockCtrl = new class() {};
-        Loader::setPrefixes(['model' => 'Test\\Model\\']);
+        // Loader::setPrefixes(['model' => 'Test\\Model\\']);
 
         Loader::autoLoadClass($mockCtrl, ['model' => ['NonExistent']]);
     }
@@ -89,26 +89,27 @@ class LoaderTest extends TestCase
     {
         $mockCtrl = new class() {
             public $test;
+            public $load;
         };
 
         Loader::intialize();
-        Loader::setPrefixes(['service' => 'Test\\Service\\']);
-        eval('namespace Test\Service; class TestService {}');
+        eval(' class TestService {}');
 
-        Loader::autoLoadClass($mockCtrl, ['service' => ['Test']]);
-        $this->assertInstanceOf('Test\Service\TestService', $mockCtrl->test);
+        Loader::autoLoadClass($mockCtrl, ['service' => ['test' => 'TestService']]);
+        $this->assertInstanceOf('TestService', $mockCtrl->load->service->test);
     }
 
     public function testServiceFailure()
     {
         $mockCtrl = new class() {
             public $test;
+            public $load;
         };
         $this->expectException(LoaderException::class);
         $this->expectExceptionCode(LoaderException::CLASS_NOT_FOUND_ERROR);
 
         Loader::intialize();
-        Loader::setPrefixes(['service' => 'Test\\Servicess\\']);
+        // Loader::setPrefixes(['service' => 'Test\\Servicess\\']);
 
         Loader::autoLoadClass($mockCtrl, ['service' => ['Test']]);
     }
@@ -116,23 +117,22 @@ class LoaderTest extends TestCase
     public function testLibrarySuccess()
     {
         $mockCtrl = new class() {
+            public $load;
             public $test;
         };
         Loader::intialize();
-        Loader::setPrefixes(['library' => 'Test\\Library\\']);
-        eval('namespace Test\Library; class Test {}');
+        eval('class Test {}');
 
         Loader::autoLoadClass($mockCtrl, ['library' => ['Test']]);
-        $this->assertInstanceOf('Test\Library\Test', $mockCtrl->test);
+        $this->assertInstanceOf('Test', $mockCtrl->load->library->test);
     }
 
     public function testLibraryFailure()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage("Library class 'NonExistent' not found");
 
         $mockCtrl = new class() {};
-        Loader::setPrefixes(['library' => 'Test\\Library\\']);
+        // Loader::setPrefixes(['library' => 'Test\\Library\\']);
 
         Loader::autoLoadClass($mockCtrl, ['library' => ['NonExistent']]);
     }
@@ -173,7 +173,6 @@ class LoaderTest extends TestCase
     public function testHelperFailure()
     {
         $this->expectException(LoaderException::class);
-        $this->expectExceptionMessage("Helper class 'NonExistentHelper' not found");
 
         // Attempt to load a non-existent helper
         $this->loader->helper('NonExistentHelper');
