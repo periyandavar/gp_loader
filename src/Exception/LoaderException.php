@@ -14,6 +14,8 @@ class LoaderException extends Exception
     public const CONFIG_NOT_FOUND_ERROR = 105;
     public const FILE_TYPE_NOT_SUPPORTED_ERROR = 106;
     public const FILE_READ_ERROR = 107;
+    public const MAPPER_NOT_FORUND_ERROR = 108;
+    public const INVALID_LOAD_CLASS_ERROR = 109;
 
     public function __construct($message = '', $code = 0, Exception $previous = null)
     {

@@ -281,12 +281,12 @@ abstract class ConfigLoader
     /**
      * Get Config
      *
-     * @param  string       $name
-     * @return ConfigLoader
+     * @param  string        $name
+     * @return ?ConfigLoader
      */
     public static function getConfig(string $name)
     {
-        return self::$instances[$name];
+        return self::$instances[$name] ?? null;
     }
 
     /**

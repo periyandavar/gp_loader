@@ -3,6 +3,9 @@
 use Loader\Config\ArrayLoader;
 use Loader\Config\ConfigLoader;
 use Loader\Config\EnvLoader;
+use Loader\Config\JsonLoader;
+use Loader\Config\XmlLoader;
+use Loader\Config\YamlLoader;
 use Loader\Exception\LoaderException;
 use PHPUnit\Framework\TestCase;
 
@@ -84,6 +87,8 @@ class ConfigLoaderTest extends TestCase
         $this->assertEquals('value1', $data['key1']);
         $this->assertArrayHasKey('key2', $data);
         $this->assertEquals('value2', $data['key2']);
+        $loader->putToEnv();
+        $this->assertEquals(getenv('key1'), 'value1');
     }
 
     public function testLoadJson()
@@ -102,7 +107,9 @@ class ConfigLoaderTest extends TestCase
 
     public function testXml()
     {
-        $config = ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.xml', 'config');
+        $config = ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.xml', 'configs', 'w');
+        $config = ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.xml', 'configs', 'a');
+        $config = ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.xml', 'configs', 'r');
         $this->assertEquals($config->getAll(), ['name' => 'test', 'value' => 1]);
     }
 
@@ -110,6 +117,13 @@ class ConfigLoaderTest extends TestCase
     {
         $this->expectException(LoaderException::class);
         $this->expectExceptionCode(LoaderException::FILE_TYPE_NOT_SUPPORTED_ERROR);
-        ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.txt');
+        ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.txt', 'namew', 'a');
+    }
+
+    public function testGetInstance()
+    {
+        $this->assertInstanceOf(JsonLoader::class, ConfigLoader::getInstance(ConfigLoader::JSON_LOADER));
+        $this->assertInstanceOf(XmlLoader::class, ConfigLoader::getInstance(ConfigLoader::XML_LOADER));
+        $this->assertInstanceOf(YamlLoader::class, ConfigLoader::getInstance(ConfigLoader::YAML_LOADER));
     }
 }
