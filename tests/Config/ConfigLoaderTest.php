@@ -3,6 +3,9 @@
 use Loader\Config\ArrayLoader;
 use Loader\Config\ConfigLoader;
 use Loader\Config\EnvLoader;
+use Loader\Config\JsonLoader;
+use Loader\Config\XmlLoader;
+use Loader\Config\YamlLoader;
 use Loader\Exception\LoaderException;
 use PHPUnit\Framework\TestCase;
 
@@ -111,5 +114,12 @@ class ConfigLoaderTest extends TestCase
         $this->expectException(LoaderException::class);
         $this->expectExceptionCode(LoaderException::FILE_TYPE_NOT_SUPPORTED_ERROR);
         ConfigLoader::loadConfig(__DIR__ . '/../fixture/test.txt');
+    }
+
+    public function testGetInstance()
+    {
+        $this->assertInstanceOf(JsonLoader::class, ConfigLoader::getInstance(ConfigLoader::JSON_LOADER));
+        $this->assertInstanceOf(XmlLoader::class, ConfigLoader::getInstance(ConfigLoader::XML_LOADER));
+        $this->assertInstanceOf(YamlLoader::class, ConfigLoader::getInstance(ConfigLoader::YAML_LOADER));
     }
 }
