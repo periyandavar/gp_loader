@@ -1,7 +1,7 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use Loader\Load;
+use PHPUnit\Framework\TestCase;
 
 class LoadTest extends TestCase
 {

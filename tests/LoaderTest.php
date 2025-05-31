@@ -11,7 +11,6 @@ class LoaderTest extends TestCase
 {
     protected $loader;
 
-
     public function testIntialize()
     {
         $instance = Loader::intialize();

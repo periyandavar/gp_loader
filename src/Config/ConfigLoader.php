@@ -281,7 +281,7 @@ abstract class ConfigLoader
     /**
      * Get Config
      *
-     * @param  string       $name
+     * @param  string        $name
      * @return ?ConfigLoader
      */
     public static function getConfig(string $name)
